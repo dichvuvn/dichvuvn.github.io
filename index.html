@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Proxy Sống HTTP/HTTPS | QUANGAPI</title>
+    <title>Proxy Sống HTTP/HTTPS | TIENDEV</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -258,21 +258,27 @@
         window.currentProxyList = arr.map(p => p.url);
     };
 
+    // Serve proxy list as proxy.txt if path is /proxy.txt
     (async function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const n = Math.max(1, Math.min(50000, parseInt(urlParams.get('n') || '100000')));
-        const arr = await fetchAllProxies(n);
-        const proxyList = arr.map(p => `${p.ip}:${p.port}`).join('\n');
-        document.body.innerHTML = `<pre style="background:#181c22;color:#8ab4f8;padding:2em">${proxyList}</pre>`;
-    })();
-    </script>
-</body>
-</html>
-</html>
-        link.click();
-        document.body.removeChild(link);
-        // Hoặc hiển thị trực tiếp ra màn hình (nếu muốn API kiểu text)
-        document.body.innerHTML = `<pre style="background:#181c22;color:#8ab4f8;padding:2em">${proxyList}</pre>`;
+        const path = window.location.pathname;
+        if (path.endsWith('/proxy.txt')) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const n = Math.max(1, Math.min(50000, parseInt(urlParams.get('n') || '100000')));
+            const arr = await fetchAllProxies(n);
+            const proxyList = arr.map(p => `${p.ip}:${p.port}`).join('\n');
+            // Xuất ra kiểu text/plain
+            document.head.innerHTML = '';
+            document.body.innerHTML = proxyList;
+            const pre = document.createElement('pre');
+            pre.textContent = proxyList;
+            document.body.innerHTML = '';
+            document.body.appendChild(pre);
+            // Đặt header Content-Type nếu chạy trên server thực (không thể đặt header bằng JS trên client)
+            // Nếu dùng Node.js/Express thì res.type('text/plain')
+            return;
+        }
+        // ...existing code for normal UI...
+        // (giữ lại giao diện cũ nếu không phải /proxy.txt)
     })();
     </script>
 </body>
