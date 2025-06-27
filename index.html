@@ -262,13 +262,13 @@
         const urlParams = new URLSearchParams(window.location.search);
         const n = Math.max(1, Math.min(50000, parseInt(urlParams.get('n') || '1000')));
         const arr = await fetchAllProxies(n);
-        const proxyList = arr.map(p => p.url).join('\n');
-        // Tạo blob và tải về dạng text/plain
-        const blob = new Blob([proxyList], {type: 'text/plain'});
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'proxy-list.txt';
-        document.body.appendChild(link);
+        const proxyList = arr.map(p => `${p.ip}:${p.port}`).join('\n');
+        // Hiển thị trực tiếp ra màn hình (dạng ip:port, không tải file)
+        document.body.innerHTML = `<pre style="background:#181c22;color:#8ab4f8;padding:2em">${proxyList}</pre>`;
+    })();
+    </script>
+</body>
+</html>
         link.click();
         document.body.removeChild(link);
         // Hoặc hiển thị trực tiếp ra màn hình (nếu muốn API kiểu text)
