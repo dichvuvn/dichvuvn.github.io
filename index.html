@@ -1,1 +1,170 @@
-<h1>Bảo Trì</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TLS Performance Tester with Proxy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-center mb-6">TLS Performance Tester</h1>
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-auto">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2" for="target">Target URL</label>
+                <input id="target" type="text" placeholder="https://example.com" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2" for="duration">Duration (seconds)</label>
+                <input id="duration" type="number" min="1" value="30" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2" for="rate">Requests per Second</label>
+                <input id="rate" type="number" min="1" value="10" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Proxy Source</label>
+                <div class="flex items-center">
+                    <input type="radio" name="proxySource" id="apiProxy" value="api" checked class="mr-2">
+                    <label for="apiProxy" class="mr-4">Fetch from API</label>
+                    <input type="radio" name="proxySource" id="manualProxy" value="manual" class="mr-2">
+                    <label for="manualProxy">Manual Input</label>
+                </div>
+            </div>
+            <div class="mb-4 hidden" id="manualProxyInput">
+                <label class="block text-gray-700 font-semibold mb-2" for="proxy">Manual Proxy List (one per line)</label>
+                <textarea id="proxy" rows="4" class="w-full p-2 border rounded" placeholder="http://proxy1:port\nhttp://proxy2:port"></textarea>
+            </div>
+            <button id="start" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Start Test</button>
+            <div id="status" class="mt-4 text-gray-700"></div>
+        </div>
+        <div id="results" class="mt-6 bg-white p-4 rounded-lg shadow-lg max-w-lg mx-auto"></div>
+    </div>
+
+    <script>
+        const userAgents = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0"
+        ];
+
+        const acceptHeaders = [
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'application/json, text/plain, */*',
+            '*/*'
+        ];
+
+        const referers = [
+            'https://www.google.com/',
+            'https://www.example.com/',
+            'https://www.wikipedia.org/'
+        ];
+
+        function randstr(length) {
+            const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let result = "";
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        function randomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        async function fetchProxies() {
+            try {
+                const response = await fetch('http://103.13.206.42:4000/proxy');
+                if (!response.ok) throw new Error('Failed to fetch proxies from API');
+                const data = await response.text();
+                return data.split('\n').filter(p => p.trim());
+            } catch (error) {
+                document.getElementById('status').textContent = `Error fetching proxies: ${error.message}`;
+                return [];
+            }
+        }
+
+        async function runTest(target, duration, rate, proxies) {
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+            status.textContent = 'Starting test...';
+            results.innerHTML = '';
+
+            const proxyList = proxies.length ? proxies : ['direct'];
+            const endTime = Date.now() + duration * 1000;
+
+            const sendRequest = async () => {
+                const proxy = randomElement(proxyList);
+                const headers = {
+                    'User-Agent': randomElement(userAgents),
+                    'Accept': randomElement(acceptHeaders),
+                    'Referer': randomElement(referers),
+                    'Cache-Control': 'no-cache',
+                    'X-Forwarded-For': `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`
+                };
+
+                try {
+                    const response = await fetch(`${target}?${randstr(8)}=${randstr(12)}`, {
+                        method: 'GET',
+                        headers: headers,
+                        mode: 'cors',
+                        cache: 'no-store'
+                    });
+                    const statusText = `Status: ${response.status} (${response.statusText}) via ${proxy}`;
+                    results.innerHTML += `<p class="text-green-600">${statusText}</p>`;
+                } catch (error) {
+                    results.innerHTML += `<p class="text-red-600">Error: ${error.message} via ${proxy}</p>`;
+                }
+            };
+
+            const interval = setInterval(async () => {
+                for (let i = 0; i < rate; i++) {
+                    if (Date.now() >= endTime) {
+                        clearInterval(interval);
+                        status.textContent = 'Test completed!';
+                        return;
+                    }
+                    sendRequest();
+                }
+            }, 1000);
+        }
+
+        document.getElementById('start').addEventListener('click', async () => {
+            const target = document.getElementById('target').value;
+            const duration = parseInt(document.getElementById('duration').value);
+            const rate = parseInt(document.getElementById('rate').value);
+            const proxySource = document.querySelector('input[name="proxySource"]:checked').value;
+            let proxies = [];
+
+            if (!target || !duration || !rate) {
+                document.getElementById('status').textContent = 'Please fill in all required fields!';
+                return;
+            }
+
+            if (!target.startsWith('http')) {
+                document.getElementById('status').textContent = 'Target URL must start with http:// or https://';
+                return;
+            }
+
+            if (proxySource === 'api') {
+                proxies = await fetchProxies();
+                if (!proxies.length) {
+                    document.getElementById('status').textContent = 'No proxies available from API!';
+                    return;
+                }
+            } else {
+                proxies = document.getElementById('proxy').value.split('\n').filter(p => p.trim());
+            }
+
+            runTest(target, duration, rate, proxies);
+        });
+
+        document.querySelectorAll('input[name="proxySource"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                document.getElementById('manualProxyInput').classList.toggle('hidden', radio.value === 'api');
+            });
+        });
+    </script>
+</body>
+</html>
