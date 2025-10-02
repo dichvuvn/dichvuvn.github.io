@@ -74,17 +74,16 @@
         }
 
         async function fetchProxies() {
-            try {
-                const response = await fetch('http://103.13.206.42:4000/proxy');
-                if (!response.ok) throw new Error('Failed to fetch proxies from API');
-                const data = await response.text();
-                return data.split('\n').filter(p => p.trim());
-            } catch (error) {
-                document.getElementById('status').textContent = `Error fetching proxies: ${error.message}`;
-                return [];
-            }
-        }
-
+    try {
+        const response = await fetch('https://proxy-gvjp.onrender.com/download/http.txt');
+        if (!response.ok) throw new Error('Failed to fetch proxies from API');
+        const data = await response.text();
+        return data.split('\n').map(p => p.trim()).filter(p => p);
+    } catch (error) {
+        document.getElementById('status').textContent = `Error fetching proxies: ${error.message}`;
+        return [];
+    }
+}
         async function runTest(target, duration, rate, proxies) {
             const status = document.getElementById('status');
             const results = document.getElementById('results');
@@ -168,3 +167,4 @@
     </script>
 </body>
 </html>
+
