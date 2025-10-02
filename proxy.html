@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Proxy Client (100% HTML)</title>
+<style>
+  body{font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;margin:18px auto;max-width:1000px}
+  h1{font-size:20px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+  button,select,input{padding:8px;border-radius:6px;border:1px solid #ccc;background:#fff}
+  textarea{width:100%;height:180px;font-family:monospace;padding:8px;border-radius:6px;border:1px solid #ddd}
+  .list{max-height:300px;overflow:auto;border:1px solid #eee;padding:6px;border-radius:6px;background:#fafafa}
+  .item{display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid #eee}
+  .ok{color:green;font-weight:700}
+  .bad{color:#b00;font-weight:700}
+  small.note{color:#666}
+</style>
+</head>
+<body>
+  <h1>Proxy Fetch & Formatter — 100% HTML</h1>
+  <p>Source: <code>https://proxy-gvjp.onrender.com/download/http.txt</code></p>
+
+  <div class="row">
+    <button id="btnFetch">Lấy proxy</button>
+    <button id="btnParse">Dọn & Hiện</button>
+    <label>Định dạng xuất:
+      <select id="fmt">
+        <option value="plain">1) Plain list (mỗi proxy 1 dòng)</option>
+        <option value="json">2) JSON</option>
+        <option value="http-lines">3) http://host:port mỗi dòng</option>
+      </select>
+    </label>
+    <button id="btnCopy">Copy</button>
+    <button id="btnDownload">Tải file</button>
+  </div>
+
+  <div class="row">
+    <label style="width:100%">Hoặc dán proxy thủ công (1 dòng 1 proxy):</label>
+  </div>
+  <textarea id="inputArea" placeholder="Paste proxies ở đây (ví dụ: 1.2.3.4:8080 hoặc http://1.2.3.4:8080)"></textarea>
+
+  <div class="row">
+    <button id="btnProbe">Probe trực tiếp (không chính xác 100%)</button>
+    <label>Concurrency:
+      <input id="concur" type="number" min="1" max="200" value="20" style="width:80px" />
+    </label>
+    <label>Timeout (ms):
+      <input id="timeout" type="number" min="500" max="30000" value="5000" style="width:100px" />
+    </label>
+    <small class="note">Probe thử fetch trực tiếp <code>http://host:port/</code>. Nhiều proxy sẽ bị CORS/CONNECT — KHÔNG TƯƠNG ĐƯƠNG kiểm tra proxy thực thụ.</small>
+  </div>
+
+  <h3>Kết quả / Preview</h3>
+  <div id="stats" style="margin-bottom:6px"></div>
+  <div id="list" class="list"></div>
+
+  <h3>Output</h3>
+  <textarea id="output" readonly placeholder="Kết quả format sẽ hiển thị ở đây"></textarea>
+
+<script>
+(() => {
+  const sourceUrl = 'https://proxy-gvjp.onrender.com/download/http.txt';
+  const btnFetch = document.getElementById('btnFetch');
+  const btnParse = document.getElementById('btnParse');
+  const btnCopy = document.getElementById('btnCopy');
+  const btnDownload = document.getElementById('btnDownload');
+  const inputArea = document.getElementById('inputArea');
+  const listDiv = document.getElementById('list');
+  const output = document.getElementById('output');
+  const fmt = document.getElementById('fmt');
+  const btnProbe = document.getElementById('btnProbe');
+  const concur = document.getElementById('concur');
+  const timeoutInput = document.getElementById('timeout');
+  const stats = document.getElementById('stats');
+
+  let proxies = []; // normalized "host:port" strings
+  let lastProbeResult = {}; // map host:port -> {ok:true/false, info:...}
+
+  function normalizeLine(line){
+    if(!line) return null;
+    let l = line.trim();
+    if(!l) return null;
+    // remove comments
+    if(l.startsWith('#')) return null;
+    // remove scheme
+    l = l.replace(/^https?:\/\//i, '');
+    // keep only host:port part (cut off any trailing slash/path)
+    l = l.split(/[\/\s]/)[0];
+    return l;
+  }
+
+  async function fetchProxies(){
+    output.value = 'Đang tải...';
+    try {
+      const r = await fetch(sourceUrl, {cache:'no-store'});
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      const txt = await r.text();
+      inputArea.value = txt;
+      parseFromTextarea();
+      output.value = '';
+    } catch(e) {
+      output.value = 'Lỗi khi tải: ' + e.message;
+    }
+  }
+
+  function parseFromTextarea(){
+    const lines = inputArea.value.split(/\r?\n/);
+    proxies = lines.map(normalizeLine).filter(Boolean);
+    lastProbeResult = {};
+    renderList();
+    updateOutput();
+  }
+
+  function renderList(){
+    listDiv.innerHTML = '';
+    if(proxies.length === 0){
+      listDiv.textContent = 'Chưa có proxy nào';
+      stats.textContent = '';
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    proxies.forEach(p => {
+      const el = document.createElement('div');
+      el.className = 'item';
+      const left = document.createElement('div');
+      left.textContent = p;
+      const right = document.createElement('div');
+      const res = lastProbeResult[p];
+      if(res){
+        right.innerHTML = res.ok ? '<span class="ok">LIVE</span>' : '<span class="bad">DEAD</span>';
+      } else {
+        right.textContent = '';
+      }
+      el.appendChild(left);
+      el.appendChild(right);
+      frag.appendChild(el);
+    });
+    listDiv.appendChild(frag);
+    stats.textContent = `Tổng: ${proxies.length} proxy`;
+  }
+
+  function formatOutputData(list){
+    const mode = fmt.value;
+    if(mode === 'plain') return list.join('\n');
+    if(mode === 'json') return JSON.stringify(list, null, 2);
+    if(mode === 'http-lines') {
+      return list.map(p => p.startsWith('http://')||p.startsWith('https://') ? p : 'http://' + p).join('\n');
+    }
+    return list.join('\n');
+  }
+
+  function updateOutput(){
+    // by default output shows all proxies; if probes done, you may prefer to show only live
+    const arr = proxies.slice(); // default: show all
+    output.value = formatOutputData(arr);
+  }
+
+  btnFetch.addEventListener('click', fetchProxies);
+  btnParse.addEventListener('click', parseFromTextarea);
+  btnCopy.addEventListener('click', async ()=>{
+    try {
+      await navigator.clipboard.writeText(output.value);
+      alert('Đã copy vào clipboard');
+    } catch(e){ alert('Copy thất bại: '+e.message) }
+  });
+  btnDownload.addEventListener('click', ()=>{
+    const blob = new Blob([output.value], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'proxies.txt';
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  // --- Probe logic (naive, client-side only) ---
+  // Trình duyệt chỉ có thể dùng HTTP(s) fetch; không thể mở socket CONNECT.
+  // Do đó probe này sẽ thử fetch('http://host:port/') với timeout. Nhiều host/proxy sẽ chặn (CORS) => probe bị FAIL
+  // Đây chỉ để "tham khảo" chứ không thể coi là kiểm tra proxy thật sự.
+  function probeOne(hostport, timeout){
+    return new Promise((resolve) => {
+      const url = (hostport.startsWith('http://')||hostport.startsWith('https://')) ? hostport : 'http://' + hostport + '/';
+      const controller = new AbortController();
+      const timer = setTimeout(()=> {
+        controller.abort();
+      }, timeout);
+      fetch(url, {mode:'no-cors', signal: controller.signal})
+        .then(res => {
+          clearTimeout(timer);
+          // note: with mode:'no-cors' we often get an opaque response we can't inspect; but fetch resolved => likely reachable
+          resolve({ok:true, info: 'fetch-resolved'});
+        })
+        .catch(err => {
+          clearTimeout(timer);
+          // could be CORS, network error, or abort timeout
+          resolve({ok:false, info: err && err.name ? err.name : String(err)});
+        });
+    });
+  }
+
+  async function probeAll(){
+    if(proxies.length === 0){
+      alert('Chưa có proxy. Nhấn "Lấy proxy" hoặc dán vào ô trước.');
+      return;
+    }
+    lastProbeResult = {};
+    renderList();
+    const concurrency = Math.max(1, Math.min(200, parseInt(concur.value) || 20));
+    const timeout = Math.max(500, parseInt(timeoutInput.value) || 5000);
+    stats.textContent = `Đang probe ${proxies.length} proxy — concurrency ${concurrency}, timeout ${timeout}ms... (client-side naive)`;
+    // simple worker pool
+    let idx = 0;
+    let live = 0, dead = 0;
+    const workers = new Array(Math.min(concurrency, proxies.length)).fill(0).map(async ()=>{
+      while(idx < proxies.length){
+        const i = idx++;
+        const p = proxies[i];
+        lastProbeResult[p] = {checking:true};
+        renderList();
+        const r = await probeOne(p, timeout);
+        lastProbeResult[p] = r;
+        if(r.ok) live++; else dead++;
+        stats.textContent = `Probe: ${i+1}/${proxies.length} — live:${live} dead:${dead}`;
+      }
+    });
+    await Promise.all(workers);
+    stats.textContent = `Xong. Tổng: ${proxies.length}, live: ${live}, dead: ${dead}. Lưu ý: probe client-side KHÔNG CHÍNH XÁC 100%.`;
+    renderList();
+    // by default, update output to show only live proxies if any were live; else show all
+    const liveList = proxies.filter(p => lastProbeResult[p] && lastProbeResult[p].ok);
+    output.value = formatOutputData(liveList.length ? liveList : proxies);
+  }
+
+  btnProbe.addEventListener('click', probeAll);
+
+  // auto-parse if user loads prefilled content
+  parseFromTextarea();
+
+})();
+</script>
+</body>
+</html>
