@@ -3,204 +3,135 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HTTP Performance Tester</title>
+<title>Safe HTTP Tester</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 p-6">
 
-<div class="container mx-auto p-6">
+<div class="max-w-2xl mx-auto bg-white shadow rounded-xl p-6">
 
-    <h1 class="text-3xl font-bold text-center mb-6">
-        HTTP Performance Tester
+    <h1 class="text-2xl font-bold mb-6">
+        Safe HTTP Tester
     </h1>
 
-    <div class="bg-white p-6 rounded-lg shadow-lg max-w-xl mx-auto">
+    <div class="mb-4">
+        <label class="font-semibold block mb-2">
+            API URL
+        </label>
 
-        <div class="mb-4">
-            <label class="block font-semibold mb-2">
-                Target URL
-            </label>
+        <input
+            id="target"
+            type="text"
+            placeholder="https://api.example.com/health"
+            class="w-full border rounded p-3"
+        >
+    </div>
 
-            <input
-                id="target"
-                type="text"
-                placeholder="https://example.com"
-                class="w-full p-2 border rounded"
-            >
-        </div>
+    <div class="grid grid-cols-2 gap-4 mb-4">
 
-        <div class="mb-4">
-            <label class="block font-semibold mb-2">
+        <div>
+            <label class="font-semibold block mb-2">
                 Duration (seconds)
             </label>
 
             <input
                 id="duration"
                 type="number"
-                min="1"
                 value="10"
-                class="w-full p-2 border rounded"
+                min="1"
+                max="60"
+                class="w-full border rounded p-3"
             >
         </div>
 
-        <div class="mb-4">
-            <label class="block font-semibold mb-2">
-                Requests per Second
+        <div>
+            <label class="font-semibold block mb-2">
+                Requests/sec
             </label>
 
             <input
                 id="rate"
                 type="number"
+                value="1"
                 min="1"
-                value="5"
-                class="w-full p-2 border rounded"
+                max="5"
+                class="w-full border rounded p-3"
             >
         </div>
 
-        <button
-            id="start"
-            class="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600"
-        >
-            Start Test
-        </button>
-
-        <div id="status" class="mt-4 font-semibold"></div>
-
     </div>
 
+    <button
+        id="startBtn"
+        class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded"
+    >
+        Start Test
+    </button>
+
+    <div id="summary" class="mt-6 font-semibold"></div>
+
     <div
-        id="results"
-        class="mt-6 bg-white p-4 rounded-lg shadow-lg max-w-xl mx-auto h-96 overflow-auto"
+        id="logs"
+        class="mt-4 h-96 overflow-auto border rounded p-3 bg-gray-50 text-sm"
     ></div>
 
 </div>
 
 <script>
 
-const userAgents = [
-    "Mozilla/5.0 Chrome/120",
-    "Mozilla/5.0 Firefox/120",
-    "Mozilla/5.0 Safari/17"
-];
+const logs = document.getElementById("logs");
+const summary = document.getElementById("summary");
 
-function randstr(length) {
-    const chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+function log(text, ok = true) {
 
-    let result = "";
+    const div = document.createElement("div");
 
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(
-            Math.floor(Math.random() * chars.length)
-        );
-    }
+    div.className = ok
+        ? "text-green-600 mb-1"
+        : "text-red-600 mb-1";
 
-    return result;
+    div.textContent = text;
+
+    logs.prepend(div);
 }
 
-function randomElement(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
-}
-
-async function sendRequest(target) {
+async function testRequest(url) {
 
     const start = performance.now();
 
     try {
 
-        const response = await fetch(
-            `${target}?r=${randstr(10)}`,
-            {
-                method: "GET",
-                cache: "no-store",
-                headers: {
-                    "Accept": "*/*",
-                    "User-Agent": randomElement(userAgents)
-                }
-            }
-        );
+        const res = await fetch(url, {
+            method: "GET",
+            cache: "no-store"
+        });
 
         const end = performance.now();
 
         return {
-            success: true,
-            status: response.status,
-            time: (end - start).toFixed(0)
+            ok: true,
+            status: res.status,
+            time: Math.round(end - start)
         };
 
-    } catch (error) {
+    } catch (err) {
 
         return {
-            success: false,
-            error: error.message
+            ok: false,
+            error: err.message
         };
 
     }
+
 }
 
-async function runTest(target, duration, rate) {
-
-    const status = document.getElementById("status");
-    const results = document.getElementById("results");
-
-    results.innerHTML = "";
-
-    let success = 0;
-    let failed = 0;
-
-    status.innerHTML = "Running test...";
-
-    const endTime = Date.now() + duration * 1000;
-
-    const interval = setInterval(async () => {
-
-        if (Date.now() >= endTime) {
-
-            clearInterval(interval);
-
-            status.innerHTML =
-                `Completed | Success: ${success} | Failed: ${failed}`;
-
-            return;
-        }
-
-        for (let i = 0; i < rate; i++) {
-
-            const result = await sendRequest(target);
-
-            const line = document.createElement("div");
-
-            if (result.success) {
-
-                success++;
-
-                line.className = "text-green-600 text-sm";
-
-                line.textContent =
-                    `✅ ${result.status} | ${result.time}ms`;
-
-            } else {
-
-                failed++;
-
-                line.className = "text-red-600 text-sm";
-
-                line.textContent =
-                    `❌ ${result.error}`;
-
-            }
-
-            results.prepend(line);
-
-        }
-
-    }, 1000);
-}
-
-document.getElementById("start")
+document.getElementById("startBtn")
 .addEventListener("click", async () => {
+
+    logs.innerHTML = "";
+    summary.innerHTML = "";
 
     const target =
         document.getElementById("target").value.trim();
@@ -211,19 +142,66 @@ document.getElementById("start")
     const rate =
         parseInt(document.getElementById("rate").value);
 
-    if (!target) {
-        alert("Nhập target URL");
-        return;
-    }
-
-    if (!target.startsWith("http://") &&
-        !target.startsWith("https://")) {
+    if (!target.startsWith("http")) {
 
         alert("URL phải bắt đầu bằng http:// hoặc https://");
+
         return;
     }
 
-    runTest(target, duration, rate);
+    let success = 0;
+    let failed = 0;
+    let totalTime = 0;
+
+    const endTime = Date.now() + duration * 1000;
+
+    const interval = setInterval(async () => {
+
+        if (Date.now() >= endTime) {
+
+            clearInterval(interval);
+
+            const avg =
+                success
+                ? Math.round(totalTime / success)
+                : 0;
+
+            summary.innerHTML = `
+                Success: ${success}<br>
+                Failed: ${failed}<br>
+                Average latency: ${avg}ms
+            `;
+
+            return;
+        }
+
+        for (let i = 0; i < rate; i++) {
+
+            const result = await testRequest(target);
+
+            if (result.ok) {
+
+                success++;
+                totalTime += result.time;
+
+                log(
+                    `✅ ${result.status} | ${result.time}ms`
+                );
+
+            } else {
+
+                failed++;
+
+                log(
+                    `❌ ${result.error}`,
+                    false
+                );
+
+            }
+
+        }
+
+    }, 1000);
 
 });
 
