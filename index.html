@@ -1,210 +1,373 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Safe HTTP Tester</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopee Info Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .main-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+        h2, h3 {
+            color: #ee4d2d; 
+            margin-top: 0;
+        }
+        h2 { text-align: center; margin-bottom: 5px; }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 14px;
+        }
+        .input-group {
+            display: flex;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px 0 0 6px;
+            font-size: 14px;
+            background: #fafafa;
+        }
+        input.config-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            box-sizing: border-box;
+        }
+        button {
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        button.btn-copy {
+            background: #e0e0e0;
+            border: 1px solid #ccc;
+            border-left: none;
+            padding: 0 15px;
+            border-radius: 0 6px 6px 0;
+            font-size: 13px;
+        }
+        button.btn-copy:hover { background: #d5d5d5; }
+        .config-box {
+            background: #fff5f2;
+            border: 1px solid #ffdbd3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button.btn-main {
+            width: 100%;
+            background: #ee4d2d;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+        }
+        button.btn-main:hover { background: #d73c1f; }
+        button.btn-main:disabled { background: #cccccc; cursor: not-allowed; }
+        .toast {
+            text-align: center;
+            color: #2e7d32;
+            font-size: 13px;
+            height: 15px;
+            margin-top: 8px;
+        }
+        
+        /* Style cho bảng lịch sử */
+        .history-box {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        button.btn-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        button.btn-danger:hover { background: #bd2130; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            word-break: break-word;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        tr:hover { background-color: #f1f3f5; }
+        .badge-ip {
+            background: #007bff;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
 </head>
+<body>
 
-<body class="bg-gray-100 p-6">
-
-<div class="max-w-2xl mx-auto bg-white shadow rounded-xl p-6">
-
-    <h1 class="text-2xl font-bold mb-6">
-        Safe HTTP Tester
-    </h1>
-
-    <div class="mb-4">
-        <label class="font-semibold block mb-2">
-            API URL
-        </label>
-
-        <input
-            id="target"
-            type="text"
-            placeholder="https://api.example.com/health"
-            class="w-full border rounded p-3"
-        >
-    </div>
-
-    <div class="grid grid-cols-2 gap-4 mb-4">
-
-        <div>
-            <label class="font-semibold block mb-2">
-                Duration (seconds)
-            </label>
-
-            <input
-                id="duration"
-                type="number"
-                value="10"
-                min="1"
-                max="60"
-                class="w-full border rounded p-3"
-            >
+<div class="main-wrapper">
+    <div class="container">
+        <h2>Shopee Bulk Info Generator</h2>
+        
+        <div class="config-box">
+            <label for="customSuffix">Chuỗi cố định thêm sau Mật khẩu (Tùy chọn):</label>
+            <input type="text" id="customSuffix" class="config-input" placeholder="Ví dụ: @shopee2026, #abc... (Để trống nếu muốn random)">
         </div>
 
-        <div>
-            <label class="font-semibold block mb-2">
-                Requests/sec
-            </label>
-
-            <input
-                id="rate"
-                type="number"
-                value="1"
-                min="1"
-                max="5"
-                class="w-full border rounded p-3"
-            >
+        <div class="form-group">
+            <label>IP Mạng Hiện Tại (Đang kết nối):</label>
+            <div class="input-group">
+                <input type="text" id="current_ip" value="Đang kiểm tra IP..." readonly style="font-weight:bold; color:#007bff;">
+                <button class="btn-copy" onclick="copyText('current_ip')">Copy</button>
+            </div>
         </div>
 
+        <div class="form-group">
+            <label>Họ và Tên thật:</label>
+            <div class="input-group">
+                <input type="text" id="fullname" readonly>
+                <button class="btn-copy" onclick="copyText('fullname')">Copy</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Username tự nhiên (Bypass AI):</label>
+            <div class="input-group">
+                <input type="text" id="username" readonly>
+                <button class="btn-copy" onclick="copyText('username')">Copy</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Mật khẩu:</label>
+            <div class="input-group">
+                <input type="text" id="password" readonly>
+                <button class="btn-copy" onclick="copyText('password')">Copy</button>
+            </div>
+        </div>
+
+        <button class="btn-main" id="btn-generate" onclick="generateAndLogInfo()">RANDOM DỮ LIỆU & LƯU LOG</button>
+        <div class="toast" id="toastMessage"></div>
     </div>
 
-    <button
-        id="startBtn"
-        class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded"
-    >
-        Start Test
-    </button>
-
-    <div id="summary" class="mt-6 font-semibold"></div>
-
-    <div
-        id="logs"
-        class="mt-4 h-96 overflow-auto border rounded p-3 bg-gray-50 text-sm"
-    ></div>
-
+    <!-- Bảng Lịch Sử Log Lưu Trữ -->
+    <div class="history-box">
+        <div class="history-header">
+            <h3>Lịch Sử Thông Tin Đã Tạo</h3>
+            <button class="btn-danger" onclick="clearHistory()">XÓA HẾT LOG</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th width="5%">STT</th>
+                    <th width="15%">IP Tạo</th>
+                    <th width="15%">Họ và Tên</th>
+                    <th width="20%">Username</th>
+                    <th width="15%">Mật khẩu</th>
+                    <th width="10%">Thời gian</th>
+                </tr>
+            </thead>
+            <tbody id="history-data">
+                <!-- Data đổ vào đây -->
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
+    const ho = ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Phan", "Vũ", "Đặng", "Bùi", "Đỗ", "Hồ", "Ngô", "Dương", "Lý", "Huỳnh", "Võ"];
+    const dem = ["Văn", "Thị", "Minh", "Anh", "Đức", "Ngọc", "Thu", "Hồng", "Tuấn", "Quang", "Khánh", "Phương", "Thanh", "Duy", "Hữu"];
+    const ten = ["Hùng", "Dũng", "Sơn", "Hải", "Đông", "Nam", "An", "Bình", "Trang", "Linh", "Hương", "Thảo", "Phượng", "Tú", "Long", "Tùng", "Vy", "Yến", "Thịnh", "Phát", "Kiệt"];
+    
+    const tinhThanh = [
+        { tinh: "Hà Nội", quan: ["Quận Cầu Giấy", "Quận Đống Đa", "Quận Thanh Xuân"], phuong: ["Phường Láng Hạ", "Phường Dịch Vọng", "Phường Mỹ Đình"], duong: ["Đường Nguyễn Trãi", "Đường Cầu Giấy", "Đường Xuân Thủy"] },
+        { tinh: "TP. Hồ Chí Minh", quan: ["Quận 1", "Quận 3", "Quận Bình Thạnh"], phuong: ["Phường 1", "Phường Bến Nghé", "Phường Thảo Điền"], duong: ["Đường Nguyễn Thị Minh Khai", "Đường Cách Mạng Tháng 8", "Đường Điện Biên Phủ"] },
+        { tinh: "Đà Nẵng", quan: ["Quận Hải Châu", "Quận Thanh Khê"], phuong: ["Phường Hòa Cường Bắc", "Phường Thạch Thang"], duong: ["Đường Lê Duẩn", "Đường Nguyễn Văn Linh"] }
+    ];
 
-const logs = document.getElementById("logs");
-const summary = document.getElementById("summary");
+    let currentIpAddress = "0.0.0.0";
 
-function log(text, ok = true) {
-
-    const div = document.createElement("div");
-
-    div.className = ok
-        ? "text-green-600 mb-1"
-        : "text-red-600 mb-1";
-
-    div.textContent = text;
-
-    logs.prepend(div);
-}
-
-async function testRequest(url) {
-
-    const start = performance.now();
-
-    try {
-
-        const res = await fetch(url, {
-            method: "GET",
-            cache: "no-store"
-        });
-
-        const end = performance.now();
-
-        return {
-            ok: true,
-            status: res.status,
-            time: Math.round(end - start)
-        };
-
-    } catch (err) {
-
-        return {
-            ok: false,
-            error: err.message
-        };
-
+    // Hàm lấy IP thực tế từ API sạch khi mở trang hoặc đổi proxy
+    async function fetchIp() {
+        document.getElementById("current_ip").value = "Đang kiểm tra IP thực tế...";
+        document.getElementById("btn-generate").disabled = true;
+        try {
+            let response = await fetch('https://api.ipify.org?format=json');
+            let data = await response.json();
+            currentIpAddress = data.ip;
+            document.getElementById("current_ip").value = currentIpAddress;
+        } catch (error) {
+            currentIpAddress = "Unknown / Khó Lấy IP";
+            document.getElementById("current_ip").value = currentIpAddress;
+        }
+        document.getElementById("btn-generate").disabled = false;
     }
 
-}
-
-document.getElementById("startBtn")
-.addEventListener("click", async () => {
-
-    logs.innerHTML = "";
-    summary.innerHTML = "";
-
-    const target =
-        document.getElementById("target").value.trim();
-
-    const duration =
-        parseInt(document.getElementById("duration").value);
-
-    const rate =
-        parseInt(document.getElementById("rate").value);
-
-    if (!target.startsWith("http")) {
-
-        alert("URL phải bắt đầu bằng http:// hoặc https://");
-
-        return;
+    function getRandomElement(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    let success = 0;
-    let failed = 0;
-    let totalTime = 0;
+    function removeVietnameseTones(str) {
+        str = str.replace(/à|á|ạ|ả|ã|â|ầ|á|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a");
+        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g,"e");
+        str = str.replace(/ì|í|ị|ỉ|ĩ/g,"i");
+        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g,"o");
+        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g,"u");
+        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g,"y");
+        str = str.replace(/đ/g,"d");
+        return str.toLowerCase();
+    }
 
-    const endTime = Date.now() + duration * 1000;
+    function generateUsername(rawName) {
+        let cleanName = removeVietnameseTones(rawName).replace(/\s+/g, '');
+        let randomSuffix = Math.floor(10 + Math.random() * 90); 
+        return getRandomElement([cleanName + randomSuffix, cleanName + "_" + randomSuffix, cleanName + Math.floor(1995 + Math.random() * 12)]);
+    }
 
-    const interval = setInterval(async () => {
+    function generatePassword() {
+        const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const lowercase = "abcdefghijklmnopqrstuvwxyz";
+        const numbers = "0123456789";
+        let pass = uppercase.charAt(Math.floor(Math.random() * uppercase.length)) + 
+                   lowercase.charAt(Math.floor(Math.random() * lowercase.length)) + 
+                   numbers.charAt(Math.floor(Math.random() * numbers.length));
+        const allChars = uppercase + lowercase + numbers;
+        for (let i = 0; i < 5; i++) pass += allChars.charAt(Math.floor(Math.random() * allChars.length));
+        return pass + document.getElementById("customSuffix").value.trim();
+    }
 
-        if (Date.now() >= endTime) {
+    function generateAddress() {
+        let region = getRandomElement(tinhThanh);
+        let soNha = Math.floor(1 + Math.random() * 400);
+        return `Số ${soNha}, ${getRandomElement(region.duong)}, ${getRandomElement(region.phuong)}, ${getRandomElement(region.quan)}, ${region.tinh}`;
+    }
 
-            clearInterval(interval);
+    // Hàm xử lý chính: Tạo thông tin, Đọc IP và đẩy vào Lịch sử lưu trữ
+    async function generateAndLogInfo() {
+        // 1. Kiểm tra lại IP thời điểm đó đề phòng bạn đổi proxy giữa chừng
+        await fetchIp();
 
-            const avg =
-                success
-                ? Math.round(totalTime / success)
-                : 0;
+        // 2. Tạo thông tin
+        let full = getRandomElement(ho) + " " + getRandomElement(dem) + " " + getRandomElement(ten);
+        let user = generateUsername(full);
+        let pass = generatePassword();
+        let addr = generateAddress();
 
-            summary.innerHTML = `
-                Success: ${success}<br>
-                Failed: ${failed}<br>
-                Average latency: ${avg}ms
-            `;
+        document.getElementById("fullname").value = full;
+        document.getElementById("username").value = user;
+        document.getElementById("password").value = pass;
+        document.getElementById("address").value = addr;
 
-            return;
+        // 3. Định dạng thời gian tạo
+        let now = new Date();
+        let timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+        // 4. Lưu vào LocalStorage
+        let newLog = { ip: currentIpAddress, fullname: full, username: user, password: pass, address: addr, time: timeStr };
+        let currentHistory = JSON.parse(localStorage.getItem("shopee_history_logs")) || [];
+        currentHistory.unshift(newLog); // Đẩy log mới lên đầu bảng
+        localStorage.setItem("shopee_history_logs", JSON.stringify(currentHistory));
+
+        // 5. Render lại bảng
+        renderHistory();
+    }
+
+    // Hàm hiển thị dữ liệu lịch sử ra bảng
+    function renderHistory() {
+        let currentHistory = JSON.parse(localStorage.getItem("shopee_history_logs")) || [];
+        let html = "";
+        
+        if(currentHistory.length === 0) {
+            html = `<tr><td colspan="7" style="text-align:center; color:#999;">Chưa có dữ liệu lịch sử nào được tạo.</td></tr>`;
+        } else {
+            currentHistory.forEach((item, index) => {
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><span class="badge-ip">${item.ip}</span></td>
+                        <td>${item.fullname}</td>
+                        <td style="font-family:monospace; font-weight:bold;">${item.username}</td>
+                        <td>${item.password}</td>
+                        <td>${item.address}</td>
+                        <td style="color:#666;">${item.time}</td>
+                    </tr>
+                `;
+            });
         }
+        document.getElementById("history-data").innerHTML = html;
+    }
 
-        for (let i = 0; i < rate; i++) {
-
-            const result = await testRequest(target);
-
-            if (result.ok) {
-
-                success++;
-                totalTime += result.time;
-
-                log(
-                    `✅ ${result.status} | ${result.time}ms`
-                );
-
-            } else {
-
-                failed++;
-
-                log(
-                    `❌ ${result.error}`,
-                    false
-                );
-
-            }
-
+    function clearHistory() {
+        if(confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử log đã lưu không?")) {
+            localStorage.removeItem("shopee_history_logs");
+            renderHistory();
         }
+    }
 
-    }, 1000);
+    function copyText(id) {
+        let copyText = document.getElementById(id);
+        if(!copyText.value || copyText.value.includes("...")) return;
+        copyText.select();
+        navigator.clipboard.writeText(copyText.value);
+        
+        let toast = document.getElementById("toastMessage");
+        toast.innerText = "Đã lưu thông tin vào bộ nhớ tạm!";
+        setTimeout(() => { toast.innerText = ""; }, 1200);
+    }
 
-});
-
+    // Khi chạy trang web: Render log cũ và tự động check IP mạng đang mở
+    window.onload = function() {
+        renderHistory();
+        fetchIp();
+    };
 </script>
 
 </body>
