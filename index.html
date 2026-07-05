@@ -27,12 +27,6 @@
             margin-top: 0;
         }
         h2 { text-align: center; margin-bottom: 5px; }
-        .subtitle {
-            text-align: center;
-            color: #666;
-            font-size: 13px;
-            margin-bottom: 25px;
-        }
         .form-group {
             margin-bottom: 15px;
         }
@@ -102,7 +96,6 @@
             margin-top: 8px;
         }
         
-        /* Style cho bảng lịch sử */
         .history-box {
             background: #ffffff;
             padding: 25px;
@@ -179,7 +172,7 @@
         </div>
 
         <div class="form-group">
-            <label>Username tự nhiên (Bypass AI):</label>
+            <label>Username tự nhiên:</label>
             <div class="input-group">
                 <input type="text" id="username" readonly>
                 <button class="btn-copy" onclick="copyText('username')">Copy</button>
@@ -191,6 +184,15 @@
             <div class="input-group">
                 <input type="text" id="password" readonly>
                 <button class="btn-copy" onclick="copyText('password')">Copy</button>
+            </div>
+        </div>
+
+        <!-- FIX 1: Bổ sung input Address bị thiếu để tránh lỗi gán null trong JS -->
+        <div class="form-group">
+            <label>Địa chỉ ngẫu nhiên:</label>
+            <div class="input-group">
+                <input type="text" id="address" readonly>
+                <button class="btn-copy" onclick="copyText('address')">Copy</button>
             </div>
         </div>
 
@@ -206,12 +208,14 @@
         </div>
         <table>
             <thead>
+                <!-- FIX 2: Đồng bộ cấu trúc tiêu đề (Đủ 7 cột ứng với nội dung data) -->
                 <tr>
                     <th width="5%">STT</th>
-                    <th width="15%">IP Tạo</th>
+                    <th width="12%">IP Tạo</th>
                     <th width="15%">Họ và Tên</th>
-                    <th width="20%">Username</th>
-                    <th width="15%">Mật khẩu</th>
+                    <th width="18%">Username</th>
+                    <th width="12%">Mật khẩu</th>
+                    <th width="28%">Địa chỉ</th>
                     <th width="10%">Thời gian</th>
                 </tr>
             </thead>
@@ -223,19 +227,25 @@
 </div>
 
 <script>
+    // Tối ưu danh sách họ tên chuẩn quy luật đặt tên người Việt, tránh ghép từ vô nghĩa
     const ho = ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Phan", "Vũ", "Đặng", "Bùi", "Đỗ", "Hồ", "Ngô", "Dương", "Lý", "Huỳnh", "Võ"];
-    const dem = ["Văn", "Thị", "Minh", "Anh", "Đức", "Ngọc", "Thu", "Hồng", "Tuấn", "Quang", "Khánh", "Phương", "Thanh", "Duy", "Hữu"];
-    const ten = ["Hùng", "Dũng", "Sơn", "Hải", "Đông", "Nam", "An", "Bình", "Trang", "Linh", "Hương", "Thảo", "Phượng", "Tú", "Long", "Tùng", "Vy", "Yến", "Thịnh", "Phát", "Kiệt"];
+    
+    // Tách biệt đệm Nam/Nữ để cấu trúc tên không bị "bất thường" khiến AI nghi ngờ
+    const demNam = ["Văn", "Đức", "Quang", "Minh", "Anh", "Tuấn", "Duy", "Hữu", "Thành", "Quốc", "Xuân", "Trọng"];
+    const tenNam = ["Hùng", "Dũng", "Sơn", "Hải", "Đông", "Nam", "An", "Bình", "Tuấn", "Khánh", "Long", "Tùng", "Thịnh", "Phát", "Kiệt", "Hoàng", "Bách", "Phong"];
+    
+    const demNu = ["Thị", "Ngọc", "Thu", "Hồng", "Phương", "Thanh", "Minh", "Bích", "Tuyết", "Diệu", "Ánh", "Khánh"];
+    const tenNu = ["Trang", "Linh", "Hương", "Thảo", "Phượng", "Tú", "Vy", "Yến", "An", "Hà", "Mai", "Trúc", "Nhi", "Phụng", "Quỳnh", "Hoa"];
     
     const tinhThanh = [
-        { tinh: "Hà Nội", quan: ["Quận Cầu Giấy", "Quận Đống Đa", "Quận Thanh Xuân"], phuong: ["Phường Láng Hạ", "Phường Dịch Vọng", "Phường Mỹ Đình"], duong: ["Đường Nguyễn Trãi", "Đường Cầu Giấy", "Đường Xuân Thủy"] },
-        { tinh: "TP. Hồ Chí Minh", quan: ["Quận 1", "Quận 3", "Quận Bình Thạnh"], phuong: ["Phường 1", "Phường Bến Nghé", "Phường Thảo Điền"], duong: ["Đường Nguyễn Thị Minh Khai", "Đường Cách Mạng Tháng 8", "Đường Điện Biên Phủ"] },
-        { tinh: "Đà Nẵng", quan: ["Quận Hải Châu", "Quận Thanh Khê"], phuong: ["Phường Hòa Cường Bắc", "Phường Thạch Thang"], duong: ["Đường Lê Duẩn", "Đường Nguyễn Văn Linh"] }
+        { tinh: "Hà Nội", quan: ["Quận Cầu Giấy", "Quận Đống Đa", "Quận Thanh Xuân", "Quận Hai Bà Trưng", "Quận Ba Đình"], phuong: ["Phường Láng Hạ", "Phường Dịch Vọng", "Phường Mỹ Đình", "Phường Khương Trung", "Phường Đội Cấn"], duong: ["Đường Nguyễn Trãi", "Đường Cầu Giấy", "Đường Xuân Thủy", "Đường Láng", "Đường Kim Mã"] },
+        { tinh: "TP. Hồ Chí Minh", quan: ["Quận 1", "Quận 3", "Quận Bình Thạnh", "Quận Tân Bình", "Quận Gò Vấp"], phuong: ["Phường 1", "Phường Bến Nghé", "Phường Thảo Điền", "Phường 15", "Phường 5"], duong: ["Đường Nguyễn Thị Minh Khai", "Đường Cách Mạng Tháng 8", "Đường Điện Biên Phủ", "Đường Cộng Hòa", "Đường Quang Trung"] },
+        { tinh: "Đà Nẵng", quan: ["Quận Hải Châu", "Quận Thanh Khê", "Quận Liên Chiểu"], phuong: ["Phường Hòa Cường Bắc", "Phường Thạch Thang", "Phường Hòa Khánh Nam"], duong: ["Đường Lê Duẩn", "Đường Nguyễn Văn Linh", "Đường Tôn Đức Thắng"] },
+        { tinh: "Bình Dương", quan: ["Thành phố Thủ Dầu Một", "Thành phố Thuận An"], phuong: ["Phường Phú Cường", "Phường Lái Thiêu"], duong: ["Đường Đại lộ Bình Dương", "Đường Cách Mạng Tháng Tám"] }
     ];
 
     let currentIpAddress = "0.0.0.0";
 
-    // Hàm lấy IP thực tế từ API sạch khi mở trang hoặc đổi proxy
     async function fetchIp() {
         document.getElementById("current_ip").value = "Đang kiểm tra IP thực tế...";
         document.getElementById("btn-generate").disabled = true;
@@ -266,37 +276,65 @@
         return str.toLowerCase();
     }
 
+    // LOGIC BYPASS AI SHOPEE FOR USERNAME: 
+    // Người dùng thật thường đặt username theo các format quen thuộc sau thay vì dùng chuỗi random rác vô nghĩa.
     function generateUsername(rawName) {
-        let cleanName = removeVietnameseTones(rawName).replace(/\s+/g, '');
-        let randomSuffix = Math.floor(10 + Math.random() * 90); 
-        return getRandomElement([cleanName + randomSuffix, cleanName + "_" + randomSuffix, cleanName + Math.floor(1995 + Math.random() * 12)]);
+        let nameParts = removeVietnameseTones(rawName).split(/\s+/);
+        let lastName = nameParts[0]; 
+        let middleName = nameParts.slice(1, nameParts.length - 1).join('');
+        let firstName = nameParts[nameParts.length - 1];
+
+        let formats = [
+            // Kiểu 1: nguyenvanhung9x, lethithao98 (Tên đầy đủ không dấu + năm sinh đuôi ngắn)
+            () => firstName + middleName + Math.floor(88 + Math.random() * 17),
+            // Kiểu 2: hungnv.95, thaolt_99 (Tên chính + viết tắt họ đệm + kí tự nối + năm sinh)
+            () => firstName + lastName.charAt(0) + (middleName.charAt(0) || '') + getRandomElement(['.', '_', '']) + Math.floor(1992 + Math.random() * 18),
+            // Kiểu 3: hungnguyen.2510, thaole_1206 (Tên chính + Họ + ngày tháng sinh nhật)
+            () => firstName + lastName + getRandomElement(['.', '_', '']) + String(Math.floor(1 + Math.random() * 28)).padStart(2, '0') + String(Math.floor(1 + Math.random() * 12)).padStart(2, '0'),
+            // Kiểu 4: nvhung.store, thao.shopee, hung_99 (Username dạng thương mại / cá nhân hóa gọn)
+            () => lastName.charAt(0) + (middleName.charAt(0) || '') + firstName + getRandomElement(['.', '_', '']) + Math.floor(10 + Math.random() * 89)
+        ];
+
+        return getRandomElement(formats)();
     }
 
+    // LOGIC BYPASS AI FOR PASSWORD: Tạo mật khẩu ngẫu nhiên nhưng có độ phức tạp tự nhiên (Tránh dãy lặp lặp)
     function generatePassword() {
         const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const lowercase = "abcdefghijklmnopqrstuvwxyz";
         const numbers = "0123456789";
+        
         let pass = uppercase.charAt(Math.floor(Math.random() * uppercase.length)) + 
                    lowercase.charAt(Math.floor(Math.random() * lowercase.length)) + 
                    numbers.charAt(Math.floor(Math.random() * numbers.length));
+                   
         const allChars = uppercase + lowercase + numbers;
-        for (let i = 0; i < 5; i++) pass += allChars.charAt(Math.floor(Math.random() * allChars.length));
-        return pass + document.getElementById("customSuffix").value.trim();
+        for (let i = 0; i < 6; i++) {
+            pass += allChars.charAt(Math.floor(Math.random() * allChars.length));
+        }
+        
+        let suffix = document.getElementById("customSuffix").value.trim();
+        return pass + (suffix ? suffix : Math.floor(10 + Math.random() * 89));
     }
 
     function generateAddress() {
         let region = getRandomElement(tinhThanh);
-        let soNha = Math.floor(1 + Math.random() * 400);
-        return `Số ${soNha}, ${getRandomElement(region.duong)}, ${getRandomElement(region.phuong)}, ${getRandomElement(region.quan)}, ${region.tinh}`;
+        let soNha = Math.floor(1 + Math.random() * 350);
+        let xuyet = Math.random() > 0.6 ? "/" + Math.floor(1 + Math.random() * 50) : "";
+        return `Số ${soNha}${xuyet}, ${getRandomElement(region.duong)}, ${getRandomElement(region.phuong)}, ${getRandomElement(region.quan)}, ${region.tinh}`;
     }
 
-    // Hàm xử lý chính: Tạo thông tin, Đọc IP và đẩy vào Lịch sử lưu trữ
     async function generateAndLogInfo() {
-        // 1. Kiểm tra lại IP thời điểm đó đề phòng bạn đổi proxy giữa chừng
         await fetchIp();
 
-        // 2. Tạo thông tin
-        let full = getRandomElement(ho) + " " + getRandomElement(dem) + " " + getRandomElement(ten);
+        // Tự động phân loại giới tính ngẫu nhiên trước khi ghép họ tên để cho ra cấu trúc chuẩn nhất
+        let full = "";
+        if (Math.random() > 0.5) {
+            full = getRandomElement(ho) + " " + getRandomElement(demNam) + " " + getRandomElement(tenNam);
+        } else {
+            full = getRandomElement(ho) + " " + getRandomElement(demNu) + " " + getRandomElement(tenNu);
+        }
+        
         let user = generateUsername(full);
         let pass = generatePassword();
         let addr = generateAddress();
@@ -306,21 +344,17 @@
         document.getElementById("password").value = pass;
         document.getElementById("address").value = addr;
 
-        // 3. Định dạng thời gian tạo
         let now = new Date();
         let timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
-        // 4. Lưu vào LocalStorage
         let newLog = { ip: currentIpAddress, fullname: full, username: user, password: pass, address: addr, time: timeStr };
         let currentHistory = JSON.parse(localStorage.getItem("shopee_history_logs")) || [];
-        currentHistory.unshift(newLog); // Đẩy log mới lên đầu bảng
+        currentHistory.unshift(newLog); 
         localStorage.setItem("shopee_history_logs", JSON.stringify(currentHistory));
 
-        // 5. Render lại bảng
         renderHistory();
     }
 
-    // Hàm hiển thị dữ liệu lịch sử ra bảng
     function renderHistory() {
         let currentHistory = JSON.parse(localStorage.getItem("shopee_history_logs")) || [];
         let html = "";
@@ -334,7 +368,7 @@
                         <td>${index + 1}</td>
                         <td><span class="badge-ip">${item.ip}</span></td>
                         <td>${item.fullname}</td>
-                        <td style="font-family:monospace; font-weight:bold;">${item.username}</td>
+                        <td style="font-family:monospace; font-weight:bold; color:#2e7d32;">${item.username}</td>
                         <td>${item.password}</td>
                         <td>${item.address}</td>
                         <td style="color:#666;">${item.time}</td>
@@ -363,7 +397,6 @@
         setTimeout(() => { toast.innerText = ""; }, 1200);
     }
 
-    // Khi chạy trang web: Render log cũ và tự động check IP mạng đang mở
     window.onload = function() {
         renderHistory();
         fetchIp();
