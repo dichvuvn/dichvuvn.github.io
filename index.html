@@ -3,269 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopee Info Generator</title>
+    <title>Tools - QUANGAPI</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+        /* Thiết lập Tone màu Đỏ - Đen - Trắng */
+        :root {
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --primary-red: #ee4d2d; /* Đỏ Shopee/Modern Red */
+            --text-light: #ffffff;
+            --text-muted: #aaaaaa;
+            --border-color: #333333;
+        }
+
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             padding: 20px;
         }
-        .main-wrapper {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+
         .container {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            background-color: var(--bg-card);
+            max-width: 500px;
+            width: 100%;
+            border-radius: 16px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        .logo-container {
             margin-bottom: 25px;
         }
-        h2, h3 {
-            color: #ee4d2d; 
-            margin-top: 0;
+
+        .logo-container img {
+            max-height: 90px;
+            max-width: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0px 4px 10px rgba(238, 77, 45, 0.3));
         }
-        h2 { text-align: center; margin-bottom: 5px; }
-        .form-group {
+
+        h1 {
+            font-size: 24px;
             margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #333;
-            font-size: 14px;
+
+        p.description {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 35px;
         }
-        .input-group {
-            display: flex;
-        }
-        input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px 0 0 6px;
-            font-size: 14px;
-            background: #fafafa;
-        }
-        input.config-input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 13px;
-            box-sizing: border-box;
-        }
-        button {
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        button.btn-copy {
-            background: #e0e0e0;
-            border: 1px solid #ccc;
-            border-left: none;
-            padding: 0 15px;
-            border-radius: 0 6px 6px 0;
-            font-size: 13px;
-        }
-        button.btn-copy:hover { background: #d5d5d5; }
-        .config-box {
-            background: #fff5f2;
-            border: 1px solid #ffdbd3;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        button.btn-main {
-            width: 100%;
-            background: #ee4d2d;
+
+        .btn-access {
+            display: inline-block;
+            background-color: var(--primary-red);
             color: white;
-            border: none;
-            padding: 12px;
+            text-decoration: none;
+            padding: 14px 35px;
+            font-weight: 600;
             font-size: 16px;
-            border-radius: 6px;
-        }
-        button.btn-main:hover { background: #d73c1f; }
-        button.btn-main:disabled { background: #cccccc; cursor: not-allowed; }
-        .toast {
-            text-align: center;
-            color: #2e7d32;
-            font-size: 13px;
-            height: 15px;
-            margin-top: 8px;
-        }
-        
-        .history-box {
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        button.btn-danger {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-        button.btn-danger:hover { background: #bd2130; }
-        table {
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(238, 77, 45, 0.4);
             width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            text-align: left;
         }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            word-break: break-word;
+
+        .btn-access:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(238, 77, 45, 0.6);
+            background-color: #ff5733;
         }
-        th {
-            background-color: #f8f9fa;
-            color: #333;
-        }
-        tr:hover { background-color: #f1f3f5; }
-        .badge-ip {
-            background: #007bff;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
+
+        /* Hiệu ứng tải trang ẩn */
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-<div class="main-wrapper">
-    <div class="container">
-        <h2>Shopee Bulk Info Generator</h2>
-        
-        <div class="config-box">
-            <label for="customSuffix">Chuỗi cố định thêm sau Mật khẩu (Tùy chọn):</label>
-            <input type="text" id="customSuffix" class="config-input" placeholder="Ví dụ: @shopee2026, #abc... (Để trống nếu muốn random)">
+    <div class="container id="app-container" class="loading">
+        <div class="logo-container">
+            <img id="tool-logo" src="" alt="Logo">
         </div>
 
-        <div class="form-group">
-            <label>IP Mạng Hiện Tại (Đang kết nối):</label>
-            <div class="input-group">
-                <input type="text" id="current_ip" value="Đang kiểm tra IP..." readonly style="font-weight:bold; color:#007bff;">
-                <button class="btn-copy" onclick="copyText('current_ip')">Copy</button>
-            </div>
-        </div>
+        <h1 id="tool-name">Đang tải...</h1>
 
-        <div class="form-group">
-            <label>Họ và Tên thật:</label>
-            <div class="input-group">
-                <input type="text" id="fullname" readonly>
-                <button class="btn-copy" onclick="copyText('fullname')">Copy</button>
-            </div>
-        </div>
+        <p id="tool-desc" class="description">Vui lòng đợi trong giây lát...</p>
 
-        <div class="form-group">
-            <label>Username tự nhiên:</label>
-            <div class="input-group">
-                <input type="text" id="username" readonly>
-                <button class="btn-copy" onclick="copyText('username')">Copy</button>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>Mật khẩu:</label>
-            <div class="input-group">
-                <input type="text" id="password" readonly>
-                <button class="btn-copy" onclick="copyText('password')">Copy</button>
-            </div>
-        </div>
-
-        <!-- FIX 1: Bổ sung input Address bị thiếu để tránh lỗi gán null trong JS -->
-        <div class="form-group">
-            <label>Địa chỉ ngẫu nhiên:</label>
-            <div class="input-group">
-                <input type="text" id="address" readonly>
-                <button class="btn-copy" onclick="copyText('address')">Copy</button>
-            </div>
-        </div>
-
-        <button class="btn-main" id="btn-generate" onclick="generateAndLogInfo()">RANDOM DỮ LIỆU & LƯU LOG</button>
-        <div class="toast" id="toastMessage"></div>
+        <a id="tool-link" href="#" target="_blank" class="btn-access">TRUY CẬP CÔNG CỤ NGAY</a>
     </div>
 
-    <!-- Bảng Lịch Sử Log Lưu Trữ -->
-    <div class="history-box">
-        <div class="history-header">
-            <h3>Lịch Sử Thông Tin Đã Tạo</h3>
-            <button class="btn-danger" onclick="clearHistory()">XÓA HẾT LOG</button>
-        </div>
-        <table>
-            <thead>
-                <!-- FIX 2: Đồng bộ cấu trúc tiêu đề (Đủ 7 cột ứng với nội dung data) -->
-                <tr>
-                    <th width="5%">STT</th>
-                    <th width="12%">IP Tạo</th>
-                    <th width="15%">Họ và Tên</th>
-                    <th width="18%">Username</th>
-                    <th width="12%">Mật khẩu</th>
-                    <th width="28%">Địa chỉ</th>
-                    <th width="10%">Thời gian</th>
-                </tr>
-            </thead>
-            <tbody id="history-data">
-                <!-- Data đổ vào đây -->
-            </tbody>
-        </table>
-    </div>
-</div>
+    <script>
+        // Hàm tự động đọc file config.txt để thay đổi nội dung trang web
+        async function loadConfig() {
+            try {
+                const response = await fetch('config.txt');
+                if (!response.ok) {
+                    throw new Error('Không thể tải file config.txt');
+                }
+                const data = await response.json();
 
-<script>
-    // Tối ưu danh sách họ tên chuẩn quy luật đặt tên người Việt, tránh ghép từ vô nghĩa
-    const ho = ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Phan", "Vũ", "Đặng", "Bùi", "Đỗ", "Hồ", "Ngô", "Dương", "Lý", "Huỳnh", "Võ"];
-    
-    // Tách biệt đệm Nam/Nữ để cấu trúc tên không bị "bất thường" khiến AI nghi ngờ
-    const demNam = ["Văn", "Đức", "Quang", "Minh", "Anh", "Tuấn", "Duy", "Hữu", "Thành", "Quốc", "Xuân", "Trọng"];
-    const tenNam = ["Hùng", "Dũng", "Sơn", "Hải", "Đông", "Nam", "An", "Bình", "Tuấn", "Khánh", "Long", "Tùng", "Thịnh", "Phát", "Kiệt", "Hoàng", "Bách", "Phong"];
-    
-    const demNu = ["Thị", "Ngọc", "Thu", "Hồng", "Phương", "Thanh", "Minh", "Bích", "Tuyết", "Diệu", "Ánh", "Khánh"];
-    const tenNu = ["Trang", "Linh", "Hương", "Thảo", "Phượng", "Tú", "Vy", "Yến", "An", "Hà", "Mai", "Trúc", "Nhi", "Phụng", "Quỳnh", "Hoa"];
-    
-    const tinhThanh = [
-        { tinh: "Hà Nội", quan: ["Quận Cầu Giấy", "Quận Đống Đa", "Quận Thanh Xuân", "Quận Hai Bà Trưng", "Quận Ba Đình"], phuong: ["Phường Láng Hạ", "Phường Dịch Vọng", "Phường Mỹ Đình", "Phường Khương Trung", "Phường Đội Cấn"], duong: ["Đường Nguyễn Trãi", "Đường Cầu Giấy", "Đường Xuân Thủy", "Đường Láng", "Đường Kim Mã"] },
-        { tinh: "TP. Hồ Chí Minh", quan: ["Quận 1", "Quận 3", "Quận Bình Thạnh", "Quận Tân Bình", "Quận Gò Vấp"], phuong: ["Phường 1", "Phường Bến Nghé", "Phường Thảo Điền", "Phường 15", "Phường 5"], duong: ["Đường Nguyễn Thị Minh Khai", "Đường Cách Mạng Tháng 8", "Đường Điện Biên Phủ", "Đường Cộng Hòa", "Đường Quang Trung"] },
-        { tinh: "Đà Nẵng", quan: ["Quận Hải Châu", "Quận Thanh Khê", "Quận Liên Chiểu"], phuong: ["Phường Hòa Cường Bắc", "Phường Thạch Thang", "Phường Hòa Khánh Nam"], duong: ["Đường Lê Duẩn", "Đường Nguyễn Văn Linh", "Đường Tôn Đức Thắng"] },
-        { tinh: "Bình Dương", quan: ["Thành phố Thủ Dầu Một", "Thành phố Thuận An"], phuong: ["Phường Phú Cường", "Phường Lái Thiêu"], duong: ["Đường Đại lộ Bình Dương", "Đường Cách Mạng Tháng Tám"] }
-    ];
-
-    let currentIpAddress = "0.0.0.0";
-
-    async function fetchIp() {
-        document.getElementById("current_ip").value = "Đang kiểm tra IP thực tế...";
-        document.getElementById("btn-generate").disabled = true;
-        try {
-            let response = await fetch('https://api.ipify.org?format=json');
-            let data = await response.json();
-            currentIpAddress = data.ip;
-            document.getElementById("current_ip").value = currentIpAddress;
-        } catch (error) {
-            currentIpAddress = "Unknown / Khó Lấy IP";
-            document.getElementById("current_ip").value = currentIpAddress;
+                // Cập nhật dữ liệu vào giao diện HTML
+                document.getElementById('tool-logo').src = data.toolLogo || 'https://via.placeholder.com/150';
+                document.getElementById('tool-logo').alt = data.toolName;
+                document.getElementById('tool-name').innerText = data.toolName;
+                document.getElementById('tool-desc').innerText = data.toolDescription;
+                document.getElementById('tool-link').href = data.toolLink;
+                
+                // Mở khóa giao diện sau khi tải xong
+                document.getElementById('app-container').classList.remove('loading');
+            } catch (error) {
+                console.error('Lỗi cấu hình:', error);
+                document.getElementById('tool-name').innerText = "Lỗi tải cấu hình";
+                document.getElementById('tool-desc').innerText = "Hãy chắc chắn rằng bạn đã tạo file 'config.txt' đúng định dạng và đặt cùng thư mục với file HTML này.";
+            }
         }
-        document.getElementById("btn-generate").disabled = false;
-    }
 
-    function getRandomElement(arr) {
-        return arr[Math.floor(Math.random() * arr.length)];
-    }
-
-    function removeVietnameseTones(str) {
+        // Chạy hàm khi trang web tải xong
+        window.onload = loadConfig;
+    </script>
+</body>
+</html>removeVietnameseTones(str) {
         str = str.replace(/à|á|ạ|ả|ã|â|ầ|á|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a");
         str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g,"e");
         str = str.replace(/ì|í|ị|ỉ|ĩ/g,"i");
