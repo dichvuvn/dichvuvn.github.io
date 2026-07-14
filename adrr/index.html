@@ -203,9 +203,11 @@
 </div>
 
 <script>
+    // ========== Dữ liệu mẫu ==========
     const brands = ["Tạp Hóa", "Shop", "Cửa Hàng", "Đại Lý", "Tiệm Sửa Xe", "Salon", "Quán Ăn", "Tiệm Điện Thoại", "Điện Máy", "Tiệm Bánh"];
     const names = ["Lan", "Hùng", "Mai", "Tuấn", "Thanh", "Vinh", "Mỹ", "Phượng", "Đức", "Khánh", "An", "Thịnh", "Mini", "24h"];
 
+    // ========== Tiện ích chung ==========
     function getRandom(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
@@ -218,127 +220,7 @@
         t._timer = setTimeout(() => { t.style.display = "none"; }, 1500);
     }
 
-    // 1. Hoán đổi ký tự tương đồng thị giác
-    function visualHomoglyphTweak(char) {
-        if (char === '0') return getRandom(['o', 'O', '0']);
-        if (char === '1') return getRandom(['l', 'I', '1']);
-        return char;
-    }
-
-    // 2. Biến tấu số điện thoại
-    function generateTweakedPhone(srcPhone) {
-        let clean = (srcPhone || '').replace(/\D/g, '');
-        if (clean.length < 9) {
-            clean = "0" + Math.floor(300000000 + Math.random() * 699999999);
-            showToast("SĐT không hợp lệ, đã tự sinh ngẫu nhiên!");
-        }
-
-        let f = clean.split('').map(c => visualHomoglyphTweak(c));
-        let s1 = f.slice(0, 4).join('');
-        let s2 = f.slice(4, 7).join('');
-        let s3 = f.slice(7).join('');
-
-        let styles = [
-            `${s1}..${s2}..${s3}`,
-            `${s1}_${s2}_${s3}`,
-            `${s1} ${s2} ${s3}`,
-            `${f.join('-')}`,
-            `${s1}*${s2}*${s3}`,
-            `[${s1}]-${s2}-${s3}`,
-            `${s1}/${s2}/${s3}`,
-            `${s1}~${s2}~${s3}`,
-            `${s1}*${s2}~${s3}`,
-            `${s1}~${s2}*${s3}`,
-            `${s1}+${s2}~${s3}`,
-            `${s1}~${s2}+${s3}`,
-            `${s1}+${s2}+${s3}`,
-            `${s1}_${s2}~${s3}`,
-            `${s1}~${s2}_${s3}`,
-            `${s1}//${s2}//${s3}`,
-            `${s1}///${s2}///${s3}`,
-            `${s1}|${s2}|${s3}`,
-            `${s1}\\${s2}\\${s3}`,
-            `${s1}•${s2}~${s3}`,
-            `${s1}~${s2}•${s3}`,
-            `${s1}[${s2}~${s3}`,
-            `lh:${f.join('')}`
-        ];
-
-        if (clean.startsWith("032")) styles.push(`không ba hai ${s2} ${s3}`);
-        if (clean.startsWith("039")) styles.push(`không ba chín ${s2} ${s3}`);
-        if (clean.startsWith("09"))  styles.push(`không chín ${clean.substring(2,5)} ${clean.substring(5)}`);
-
-        return getRandom(styles);
-    }
-
-    // 3. Xáo trộn cấu trúc số nhà
-    function tweakStreetAddress(srcAddr) {
-        let addr = (srcAddr || '').trim();
-        if (!addr) return ''; // QUAN TRỌNG: không tự sinh nếu bỏ trống
-
-        let slashRegex = /(\d+)\/(\d+)/;
-        if (slashRegex.test(addr)) {
-            let match = addr.match(slashRegex);
-            let truoc = match[1];
-            let sau = match[2];
-            let rest = addr.replace(slashRegex, '').trim();
-
-            let variants = [
-                `Số ${truoc}/${sau} ${rest}`,
-                `Hẻm ${truoc} Số ${sau} ${rest}`,
-                `Số ${truoc} Hẻm ${sau} ${rest}`,
-                `${truoc} xẹt ${sau} Đường ${rest}`,
-                `Vào hẻm ${truoc}/${sau} ${rest}`,
-                `Nhà số ${truoc} hẹt ${sau} ${rest}`,
-                `${truoc}/${sau} ${rest}`
-            ];
-            return getRandom(variants);
-        } else {
-            let prefixes = ["Số ", "Nhà số ", "Khu ", "", "Ngay số "];
-            return getRandom(prefixes) + addr;
-        }
-    }
-
-    // 4. Sinh mẫu câu Note (ĐÃ SỬA thiếu dấu phẩy ở cuối mảng)
-    function buildFullNoteStructure(tweakedPhone) {
-        let templates = [
-            `[LH ${tweakedPhone}]`,
-            `[Sđt ${tweakedPhone}]`,
-            `[Alo ${tweakedPhone}]`,
-            `(Giao gọi: ${tweakedPhone})`,
-            `(Liên hệ: ${tweakedPhone})`,
-            `[Call me ${tweakedPhone}]`,
-            `(Đt bàn giao: ${tweakedPhone})`,
-            `- Số ĐT: ${tweakedPhone}`,
-            `/ Phone Nhận hàng: ${tweakedPhone}`,
-            `[Gặp nhận hàng: ${tweakedPhone}]`,
-            `_Ship gọi ${tweakedPhone}`,
-            `(Không đổi số: ${tweakedPhone})`,
-            `[Mọi chi tiết gọi ${tweakedPhone}]`,
-            `[Số chính chủ: ${tweakedPhone}]`,
-            `(đt liên lạc: ${tweakedPhone})`,
-            `[Hotline ${tweakedPhone}]`,
-            `- ĐT Nhận: ${tweakedPhone}`,
-            `(Alo khi tới: ${tweakedPhone})`,
-            `[Vui lòng gọi ${tweakedPhone}]`,
-            `[Liên hệ trực tiếp ${tweakedPhone}]`,
-<script>
-    const brands = ["Tạp Hóa", "Shop", "Cửa Hàng", "Đại Lý", "Tiệm Sửa Xe", "Salon", "Quán Ăn", "Tiệm Điện Thoại", "Điện Máy", "Tiệm Bánh"];
-    const names = ["Lan", "Hùng", "Mai", "Tuấn", "Thanh", "Vinh", "Mỹ", "Phượng", "Đức", "Khánh", "An", "Thịnh", "Mini", "24h"];
-
-    function getRandom(arr) {
-        return arr[Math.floor(Math.random() * arr.length)];
-    }
-
-    function showToast(msg) {
-        let t = document.getElementById("toast");
-        t.innerText = msg;
-        t.style.display = "block";
-        clearTimeout(t._timer);
-        t._timer = setTimeout(() => { t.style.display = "none"; }, 1500);
-    }
-
-    // 1. Hoán đổi ký tự tương đồng thị giác nâng cao cho Shopee
+    // 1. Hoán đổi ký tự tương đồng thị giác nâng cao (dùng số vòng tròn ⓪-⑨)
     function visualHomoglyphTweak(char) {
         if (char === '0') return getRandom(['o', 'O', '⓪']);
         if (char === '1') return getRandom(['l', 'I', '①']);
@@ -370,36 +252,40 @@
             showToast("SĐT không hợp lệ, đã tự sinh ngẫu nhiên!");
         }
 
-        // Tách số điện thoại thành 3 phần: Đầu, Giữa, Cuối (Ví dụ: 0987 654 321)
+        // Tách SĐT thành 3 phần: Đầu - Giữa - Cuối (VD: 0987 654 321)
         let s1 = clean.slice(0, 4);
         let s2 = clean.slice(4, 7);
         let s3 = clean.slice(7);
 
-        // Biến thể dùng vòng tròn số (⓪-⑨) -> Shipper đọc cực dễ, AI chịu chết
+        // Biến thể dùng vòng tròn số (⓪-⑨) -> Shipper đọc dễ, AI khó quét
         let circledS1 = s1.split('').map(c => visualHomoglyphTweak(c)).join('');
         let circledS2 = s2.split('').map(c => visualHomoglyphTweak(c)).join('');
         let circledS3 = s3.split('').map(c => visualHomoglyphTweak(c)).join('');
 
-        // Các kiểu biến tấu "Độc chiêu" vượt bão quét Shopee:
+        // Các kiểu biến tấu "độc chiêu"
         let styles = [
-            // Kiểu 1: Trộn lẫn dấu hiệu gạch chéo kép, AI tưởng là link nhưng thực chất là sđt
             `//${s1}//${s2}//${s3}//`,
-            // Kiểu 2: Đột phá bằng số vòng tròn (Visual siêu dễ đọc)
             `${circledS1} ${circledS2} ${circledS3}`,
-            // Kiểu 3: Viết chữ số đầu và cuối bằng chữ tiếng Việt
             `Không_${s1.substring(1)}_${s2}_${s3}`,
-            // Kiểu 4: Chữ xen kẽ số để bẻ gãy bộ phân tích cú pháp chuỗi của AI
             `${s1}..nhấn..${s2}..gọi..${s3}`,
-            // Kiểu 5: Dạng phương trình/ghi chú kỹ thuật
             `[${s1}]-[${s2}]-[${s3}]`,
-            // Kiểu 6: Dùng ký tự đặc biệt "gạch đứng mảnh" để ngắt dòng
             `l.hệ:${s1}│${s2}│${s3}`,
-            // Kiểu 7: Viết hoàn toàn bằng chữ hoặc pha trộn "Không Ba Chín..."
             `${numToVietnamese(clean[0])} ${numToVietnamese(clean[1])} ${numToVietnamese(clean[2])}..${s2}..${s3}`,
-            // Kiểu 8: Định dạng mã hóa ngày tháng giả
             `SĐT_N_H_${s1}.${s2}.${s3}`,
-            // Kiểu 9: Thay số 0 đầu bằng chữ "O" hoa và xen kẽ ký tự hình sao
-            `O${clean.substring(1,4)}★${s2}★${s3}`
+            `O${clean.substring(1,4)}★${s2}★${s3}`,
+            // Thêm các kiểu từ bản cũ để tăng đa dạng
+            `${s1}..${s2}..${s3}`,
+            `${s1}_${s2}_${s3}`,
+            `${s1} ${s2} ${s3}`,
+            `${clean.split('').join('-')}`,
+            `${s1}*${s2}*${s3}`,
+            `${s1}/${s2}/${s3}`,
+            `${s1}~${s2}~${s3}`,
+            `${s1}|${s2}|${s3}`,
+            `lh:${clean}`,
+            `không ba hai ${s2} ${s3}`,
+            `không ba chín ${s2} ${s3}`,
+            `không chín ${clean.substring(2,5)} ${clean.substring(5)}`
         ];
 
         return getRandom(styles);
@@ -408,7 +294,7 @@
     // 3. Xáo trộn cấu trúc số nhà
     function tweakStreetAddress(srcAddr) {
         let addr = (srcAddr || '').trim();
-        if (!addr) return ''; 
+        if (!addr) return ''; // QUAN TRỌNG: không tự sinh nếu bỏ trống
 
         let slashRegex = /(\d+)\/(\d+)/;
         if (slashRegex.test(addr)) {
@@ -433,7 +319,7 @@
         }
     }
 
-    // 4. Các mẫu câu đệm (được làm mờ để AI không quét được từ khóa)
+    // 4. Sinh mẫu câu Note (dùng ký tự giả AI — thay 'i' bằng 'j', 'a' bằng 'à'...)
     function buildFullNoteStructure(tweakedPhone) {
         let templates = [
             `[Gọj ${tweakedPhone}]`,
@@ -446,7 +332,27 @@
             `(Khg đổj số: ${tweakedPhone})`,
             `[SĐT chín chủ: ${tweakedPhone}]`,
             `[Hot_Line: ${tweakedPhone}]`,
-            `(_Nhận hàg alo: ${tweakedPhone})`
+            `(_Nhận hàg alo: ${tweakedPhone})`,
+            `[LH ${tweakedPhone}]`,
+            `[Sđt ${tweakedPhone}]`,
+            `[Alo ${tweakedPhone}]`,
+            `(Giao gọi: ${tweakedPhone})`,
+            `(Liên hệ: ${tweakedPhone})`,
+            `[Call me ${tweakedPhone}]`,
+            `(Đt bàn giao: ${tweakedPhone})`,
+            `- Số ĐT: ${tweakedPhone}`,
+            `/ Phone Nhận hàng: ${tweakedPhone}`,
+            `[Gặp nhận hàng: ${tweakedPhone}]`,
+            `_Ship gọi ${tweakedPhone}`,
+            `(Không đổi số: ${tweakedPhone})`,
+            `[Mọi chi tiết gọi ${tweakedPhone}]`,
+            `[Số chính chủ: ${tweakedPhone}]`,
+            `(đt liên lạc: ${tweakedPhone})`,
+            `[Hotline ${tweakedPhone}]`,
+            `- ĐT Nhận: ${tweakedPhone}`,
+            `(Alo khi tới: ${tweakedPhone})`,
+            `[Vui lòng gọi ${tweakedPhone}]`,
+            `[Liên hệ trực tiếp ${tweakedPhone}]`
         ];
         return getRandom(templates);
     }
@@ -501,6 +407,7 @@
         });
     }
 
+    // 7. Phím tắt Enter
     document.addEventListener("keydown", (e) => {
         if (e.key === "Enter") processBypassAi();
     });
