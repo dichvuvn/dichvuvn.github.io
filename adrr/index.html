@@ -198,7 +198,7 @@
             <input type="text" id="res_full_address" class="has-btn" readonly style="color:#222; font-weight:500;" placeholder="Địa chỉ sau khi lồng cụm Note...">
             <button class="btn-copy" onclick="copyText('res_full_address')">Copy</button>
         </div>
-        <div class="hint" id="addr_hint" style="display:none;">Không nhập địa chỉ nên ô này trống — chỉ biến tấu SĐT.</div>
+        <div class="hint" id="addr_hint" style="display:none;">Nhập địa chỉ</div>
     </div>
 </div>
 
@@ -249,7 +249,7 @@
         let clean = (srcPhone || '').replace(/\D/g, '');
         if (clean.length < 9) {
             clean = "0" + Math.floor(300000000 + Math.random() * 699999999);
-            showToast("SĐT không hợp lệ, đã tự sinh ngẫu nhiên!");
+            showToast("SĐT không hợp lệ!");
         }
 
         // Tách SĐT thành 3 phần: Đầu - Giữa - Cuối (VD: 0987 654 321)
@@ -327,7 +327,7 @@
             `[Alô ${tweakedPhone}]`,
             `(Gjáo gọj: ${tweakedPhone})`,
             `(Ljên hệ: ${tweakedPhone})`,
-            `[Cáll_mê ${tweakedPhone}]`,
+            `[Call_me ${tweakedPhone}]`,
             `(_Shjp gọj: ${tweakedPhone})`,
             `(Khg đổj số: ${tweakedPhone})`,
             `[SĐT chín chủ: ${tweakedPhone}]`,
@@ -352,7 +352,10 @@
             `- ĐT Nhận: ${tweakedPhone}`,
             `(Alo khi tới: ${tweakedPhone})`,
             `[Vui lòng gọi ${tweakedPhone}]`,
-            `[Liên hệ trực tiếp ${tweakedPhone}]`
+            `[Liên hệ trực tiếp ${tweakedPhone}]`,
+            `[Giao sdt${tweakedPhone} nha ship]`,
+            `[sdtnhanhang ${tweakedPhone}]`
+            `[sdtcuadonhang ${tweakedPhone}]`
         ];
         return getRandom(templates);
     }
