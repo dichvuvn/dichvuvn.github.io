@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Address Generator</title>
+    <title>Address Generator Pro</title>
     <style>
         :root {
             --primary-color: #ee4d2d;
@@ -145,10 +145,6 @@
         .result-block {
             transition: opacity .2s;
         }
-        .result-block.disabled {
-            opacity: .4;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body>
@@ -203,11 +199,9 @@
 </div>
 
 <script>
-    // ========== Dữ liệu mẫu ==========
     const brands = ["Tạp Hóa", "Shop", "Cửa Hàng", "Đại Lý", "Tiệm Sửa Xe", "Salon", "Quán Ăn", "Tiệm Điện Thoại", "Điện Máy", "Tiệm Bánh"];
     const names = ["Lan", "Hùng", "Mai", "Tuấn", "Thanh", "Vinh", "Mỹ", "Phượng", "Đức", "Khánh", "An", "Thịnh", "Mini", "24h"];
 
-    // ========== Tiện ích chung ==========
     function getRandom(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
@@ -220,7 +214,11 @@
         t._timer = setTimeout(() => { t.style.display = "none"; }, 1500);
     }
 
-    // 1. Hoán đổi ký tự tương đồng thị giác nâng cao (dùng số vòng tròn ⓪-⑨)
+    // Tận dụng ký tự khoảng trống vô hình xen kẽ để bẻ gãy bộ quét chuỗi AI
+    function insertZeroWidthSpace(str) {
+        return str.split('').join('\u200B');
+    }
+
     function visualHomoglyphTweak(char) {
         if (char === '0') return getRandom(['o', 'O', '⓪']);
         if (char === '1') return getRandom(['l', 'I', '①']);
@@ -235,7 +233,6 @@
         return char;
     }
 
-    // Chuyển một chữ số thành chữ Tiếng Việt
     function numToVietnamese(char) {
         const dict = {
             '0': 'Không', '1': 'Một', '2': 'Hai', '3': 'Ba', '4': 'Bốn',
@@ -244,25 +241,21 @@
         return dict[char] || char;
     }
 
-    // 2. Biến tấu số điện thoại chuyên sâu vượt AI Shopee
     function generateTweakedPhone(srcPhone) {
         let clean = (srcPhone || '').replace(/\D/g, '');
         if (clean.length < 9) {
             clean = "0" + Math.floor(300000000 + Math.random() * 699999999);
-            showToast("SĐT không hợp lệ!");
+            showToast("Phát hiện trống/SĐT lỗi! Đã tự sinh số ngẫu nhiên.");
         }
 
-        // Tách SĐT thành 3 phần: Đầu - Giữa - Cuối (VD: 0987 654 321)
         let s1 = clean.slice(0, 4);
         let s2 = clean.slice(4, 7);
         let s3 = clean.slice(7);
 
-        // Biến thể dùng vòng tròn số (⓪-⑨) -> Shipper đọc dễ, AI khó quét
         let circledS1 = s1.split('').map(c => visualHomoglyphTweak(c)).join('');
         let circledS2 = s2.split('').map(c => visualHomoglyphTweak(c)).join('');
         let circledS3 = s3.split('').map(c => visualHomoglyphTweak(c)).join('');
 
-        // Các kiểu biến tấu "độc chiêu"
         let styles = [
             `//${s1}//${s2}//${s3}//`,
             `${circledS1} ${circledS2} ${circledS3}`,
@@ -273,7 +266,6 @@
             `${numToVietnamese(clean[0])} ${numToVietnamese(clean[1])} ${numToVietnamese(clean[2])}..${s2}..${s3}`,
             `SĐT_N_H_${s1}.${s2}.${s3}`,
             `O${clean.substring(1,4)}★${s2}★${s3}`,
-            // Thêm các kiểu từ bản cũ để tăng đa dạng
             `${s1}..${s2}..${s3}`,
             `${s1}_${s2}_${s3}`,
             `${s1} ${s2} ${s3}`,
@@ -282,19 +274,18 @@
             `${s1}/${s2}/${s3}`,
             `${s1}~${s2}~${s3}`,
             `${s1}|${s2}|${s3}`,
-            `lh:${clean}`,
+            `lh:${clean.substring(0,4)}.${clean.substring(4,7)}.${clean.substring(7)}`,
             `không ba hai ${s2} ${s3}`,
-            `không ba chín ${s2} ${s3}`,
             `không chín ${clean.substring(2,5)} ${clean.substring(5)}`
         ];
 
-        return getRandom(styles);
+        // Trả về ngẫu nhiên một kiểu và bọc thêm khoảng trống vô hình chống quét sâu
+        return insertZeroWidthSpace(getRandom(styles));
     }
 
-    // 3. Xáo trộn cấu trúc số nhà
     function tweakStreetAddress(srcAddr) {
         let addr = (srcAddr || '').trim();
-        if (!addr) return ''; // QUAN TRỌNG: không tự sinh nếu bỏ trống
+        if (!addr) return '';
 
         let slashRegex = /(\d+)\/(\d+)/;
         if (slashRegex.test(addr)) {
@@ -319,7 +310,6 @@
         }
     }
 
-    // 4. Sinh mẫu câu Note (dùng ký tự giả AI — thay 'i' bằng 'j', 'a' bằng 'à'...)
     function buildFullNoteStructure(tweakedPhone) {
         let templates = [
             `[Gọj ${tweakedPhone}]`,
@@ -330,7 +320,7 @@
             `[Call_me ${tweakedPhone}]`,
             `(_Shjp gọj: ${tweakedPhone})`,
             `(Khg đổj số: ${tweakedPhone})`,
-            `[SĐT chín chủ: ${tweakedPhone}]`,
+            `[SĐT chính chủ: ${tweakedPhone}]`,
             `[Hot_Line: ${tweakedPhone}]`,
             `(_Nhận hàg alo: ${tweakedPhone})`,
             `[LH ${tweakedPhone}]`,
@@ -360,7 +350,6 @@
         return getRandom(templates);
     }
 
-    // 5. Điều khiển chính
     function processBypassAi() {
         let phoneInput = document.getElementById("source_phone").value.trim();
         let addrInput  = document.getElementById("source_address").value.trim();
@@ -368,15 +357,12 @@
         let isNoteChecked  = document.getElementById("opt_note_phone").checked;
         let isBrandChecked = document.getElementById("opt_random_brand").checked;
 
-        // --- Xử lý SĐT ---
         let rawTweakedPhone = generateTweakedPhone(phoneInput);
         let fullNotePhoneStr = isNoteChecked ? buildFullNoteStructure(rawTweakedPhone) : rawTweakedPhone;
 
-        // --- Xử lý địa chỉ ---
         let streetTweaked = tweakStreetAddress(addrInput);
         let hasAddress = streetTweaked.length > 0;
 
-        // --- Ghép kết quả cuối ---
         let finalFullAddress = "";
         if (hasAddress) {
             let prefixBrandStr = isBrandChecked ? `(${getRandom(brands)} ${getRandom(names)}) ` : "";
@@ -385,16 +371,13 @@
             finalFullAddress = fullNotePhoneStr;
         }
 
-        // --- Xuất ra UI ---
         document.getElementById("res_phone_note").value = fullNotePhoneStr;
         document.getElementById("res_full_address").value = finalFullAddress;
-
         document.getElementById("addr_hint").style.display = hasAddress ? "none" : "block";
 
         showToast(hasAddress ? "Đã tạo xong địa chỉ + SĐT!" : "Thành Công!");
     }
 
-    // 6. Copy nhanh
     function copyText(id) {
         let el = document.getElementById(id);
         if (!el.value) {
@@ -410,7 +393,6 @@
         });
     }
 
-    // 7. Phím tắt Enter
     document.addEventListener("keydown", (e) => {
         if (e.key === "Enter") processBypassAi();
     });
