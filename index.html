@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tools - QUANGAPI</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QUANGAPI - Tool Suite</title>
     <style>
-        /* Thiết lập Tone màu Đỏ - Đen - Trắng */
+        /* ===== ROOT – Tone Đỏ – Đen – Trắng ===== */
         :root {
             --bg-dark: #121212;
             --bg-card: #1e1e1e;
-            --primary-red: #ee4d2d; /* Đỏ Shopee/Modern Red */
+            --bg-card-hover: #2a2a2a;
+            --primary-red: #ee4d2d;
+            --primary-red-hover: #ff5733;
             --text-light: #ffffff;
             --text-muted: #aaaaaa;
+            --text-dark: #888888;
             --border-color: #333333;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --radius: 16px;
+            --transition: 0.3s ease;
         }
 
         * {
@@ -25,118 +31,887 @@
         body {
             background-color: var(--bg-dark);
             color: var(--text-light);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            align-items: flex-start;
+            padding: 30px 20px;
         }
 
         .container {
             background-color: var(--bg-card);
-            max-width: 500px;
+            max-width: 820px;
             width: 100%;
-            border-radius: 16px;
-            padding: 40px 30px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: var(--radius);
+            padding: 35px 30px 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo img {
+            height: 48px;
+            width: auto;
+            filter: drop-shadow(0 4px 12px rgba(238, 77, 45, 0.35));
+        }
+
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #ee4d2d, #ff7a4d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-sub {
+            margin-left: auto;
+            font-size: 13px;
+            color: var(--text-muted);
+            background: var(--bg-dark);
+            padding: 6px 16px;
+            border-radius: 30px;
             border: 1px solid var(--border-color);
         }
 
-        .logo-container {
-            margin-bottom: 25px;
+        /* ===== INTRO (trang chủ) ===== */
+        .intro {
+            text-align: center;
+            padding: 20px 10px 10px;
         }
 
-        .logo-container img {
-            max-height: 90px;
-            max-width: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0px 4px 10px rgba(238, 77, 45, 0.3));
+        .intro h2 {
+            font-size: 26px;
+            margin-bottom: 12px;
         }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        p.description {
+        .intro p {
             color: var(--text-muted);
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 35px;
-        }
-
-        .btn-access {
-            display: inline-block;
-            background-color: var(--primary-red);
-            color: white;
-            text-decoration: none;
-            padding: 14px 35px;
-            font-weight: 600;
             font-size: 16px;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        .intro-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .intro-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 28px 24px 30px;
+            flex: 1 1 260px;
+            max-width: 340px;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .intro-card:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(238, 77, 45, 0.15);
+        }
+
+        .intro-card .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .intro-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .intro-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .btn-intro {
+            display: inline-block;
+            padding: 10px 28px;
+            background: var(--primary-red);
+            color: #fff;
             border-radius: 30px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(238, 77, 45, 0.4);
-            width: 100%;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(238, 77, 45, 0.3);
         }
 
-        .btn-access:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(238, 77, 45, 0.6);
-            background-color: #ff5733;
+        .btn-intro:hover {
+            background: var(--primary-red-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(238, 77, 45, 0.5);
         }
 
-        /* Hiệu ứng tải trang ẩn */
-        .loading {
+        /* ===== TOOL PANEL ===== */
+        .tool-panel {
+            display: none;
+            animation: fadeUp 0.4s ease;
+        }
+
+        .tool-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tool-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tool-title .icon {
+            font-size: 26px;
+        }
+
+        .tool-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 22px;
+            border-left: 3px solid var(--primary-red);
+            padding-left: 14px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            color: var(--primary-red);
+        }
+
+        /* ===== GENERATE AREA ===== */
+        .gen-area {
+            background: var(--bg-dark);
+            border-radius: 12px;
+            padding: 22px 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .gen-area .label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gen-area .label .count {
+            font-size: 12px;
+            background: var(--bg-card);
+            padding: 2px 12px;
+            border-radius: 20px;
+            color: var(--text-muted);
+        }
+
+        .gen-area .output {
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.7;
+            word-break: break-word;
+            min-height: 60px;
+            color: var(--text-light);
+            padding: 6px 0;
+        }
+
+        .gen-area .output .muted {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 15px;
+        }
+
+        .gen-area .output .sub {
+            display: block;
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .btn {
+            padding: 13px 30px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-red);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(238, 77, 45, 0.35);
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-red-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(238, 77, 45, 0.5);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+            flex: 0 1 auto;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary-red);
+        }
+
+        .btn-success {
+            background: #2e7d32;
+            color: #fff;
+            flex: 0 1 auto;
+        }
+
+        .btn-success:hover {
+            background: #388e3c;
+            transform: translateY(-2px);
+        }
+
+        .btn-success.copied {
+            background: #1b5e20;
+        }
+
+        .btn:disabled {
             opacity: 0.5;
             pointer-events: none;
+        }
+
+        /* ===== HISTORY ===== */
+        .history-area {
+            margin-top: 18px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 18px;
+        }
+
+        .history-area .h-title {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .history-area .h-title .clear-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .history-area .h-title .clear-btn:hover {
+            color: var(--primary-red);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 140px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--primary-red);
+            border-radius: 10px;
+        }
+
+        .history-item {
+            background: var(--bg-dark);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+            border-left: 3px solid var(--primary-red);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-item .h-text {
+            flex: 1;
+            word-break: break-word;
+            font-size: 13px;
+        }
+
+        .history-item .h-time {
+            font-size: 11px;
+            color: var(--text-dark);
+            white-space: nowrap;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .container {
+                padding: 20px 16px 30px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .header-sub {
+                margin-left: 0;
+                font-size: 12px;
+            }
+
+            .intro h2 {
+                font-size: 22px;
+            }
+            .intro-card {
+                flex: 1 1 100%;
+                max-width: 100%;
+            }
+
+            .gen-area {
+                padding: 16px;
+            }
+            .gen-area .output {
+                font-size: 16px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .btn-secondary {
+                flex: 1;
+            }
+
+            .logo h1 {
+                font-size: 18px;
+            }
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--bg-card);
+            color: var(--text-light);
+            padding: 14px 28px;
+            border-radius: 40px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s ease;
+            z-index: 999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
     </style>
 </head>
 <body>
 
-    <div class="container id="app-container" class="loading">
-        <div class="logo-container">
-            <img id="tool-logo" src="" alt="Logo">
+    <div class="container">
+
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <div class="logo">
+                <img src="https://i.imgur.com/7k9vX3E.png" alt="QUANGAPI Logo"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22 viewBox=%220 0 48 48%22%3E%3Crect width=%2248%22 height=%2248%22 fill=%22%23ee4d2d%22 rx=%2212%22/%3E%3Ctext x=%2224%22 y=%2232%22 text-anchor=%22middle%22 fill=%22%23fff%22 font-size=%2224%22 font-weight=%22700%22%3EQ%3C/text%3E%3C/svg%3E'" />
+                <h1>QUANGAPI</h1>
+            </div>
+            <span class="header-sub">⚡ Tool Suite</span>
         </div>
 
-        <h1 id="tool-name">Đang tải...</h1>
+        <!-- ============================================================ -->
+        <!-- ===== TRANG GIỚI THIỆU (path = / hoặc không khớp) ===== -->
+        <!-- ============================================================ -->
+        <div id="page-intro" class="intro">
+            <h2>🚀 Bộ công cụ dành cho bạn</h2>
+            <p>
+                Chọn một công cụ bên dưới để bắt đầu. Mỗi công cụ đều được tối ưu cho tốc độ và độ chính xác.
+            </p>
+            <div class="intro-grid">
+                <div class="intro-card">
+                    <div class="icon">📍</div>
+                    <h3>Address Generator Pro</h3>
+                    <p>Tạo địa chỉ Việt Nam ngẫu nhiên với đầy đủ thông tin chi tiết.</p>
+                    <a href="/adrr" class="btn-intro">Truy cập →</a>
+                </div>
+                <div class="intro-card">
+                    <div class="icon">🛍️</div>
+                    <h3>Shopee Generator Info Ultimate</h3>
+                    <p>Tạo thông tin người dùng Shopee ngẫu nhiên, bao gồm đơn hàng và sản phẩm.</p>
+                    <a href="/shoppe" class="btn-intro">Truy cập →</a>
+                </div>
+            </div>
+        </div>
 
-        <p id="tool-desc" class="description">Vui lòng đợi trong giây lát...</p>
+        <!-- ============================================================ -->
+        <!-- ===== TOOL 1: ADDRESS GENERATOR PRO ===== -->
+        <!-- ============================================================ -->
+        <div id="page-adrr" class="tool-panel">
+            <a href="/" class="back-link">← Quay lại trang chủ</a>
+            <div class="tool-title">
+                <span class="icon">📍</span>
+                Address Generator Pro
+            </div>
+            <div class="tool-desc">
+                Tạo địa chỉ ngẫu nhiên tại Việt Nam với đầy đủ thông tin: Tỉnh/Thành, Quận/Huyện, Phường/Xã, Đường, Số nhà và Mã bưu điện.
+            </div>
 
-        <a id="tool-link" href="#" target="_blank" class="btn-access">TRUY CẬP CÔNG CỤ NGAY</a>
+            <div class="gen-area">
+                <div class="label">
+                    <span>📬 Địa chỉ được tạo</span>
+                    <span class="count" id="addr-count">#0</span>
+                </div>
+                <div class="output" id="addr-output">
+                    <span class="muted">Nhấn "Tạo địa chỉ" để bắt đầu</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btn-gen-addr">🎲 Tạo địa chỉ</button>
+                <button class="btn btn-success" id="btn-copy-addr">📋 Sao chép</button>
+                <button class="btn btn-secondary" id="btn-addr-more">➕ Tạo thêm</button>
+            </div>
+
+            <div class="history-area">
+                <div class="h-title">
+                    <span>📜 Lịch sử</span>
+                    <button class="clear-btn" id="clear-addr-history">Xóa tất cả</button>
+                </div>
+                <div class="history-list" id="addr-history"></div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== TOOL 2: SHOPEE GENERATOR INFO ULTIMATE ===== -->
+        <!-- ============================================================ -->
+        <div id="page-shoppe" class="tool-panel">
+            <a href="/" class="back-link">← Quay lại trang chủ</a>
+            <div class="tool-title">
+                <span class="icon">🛍️</span>
+                Shopee Generator Info Ultimate
+            </div>
+            <div class="tool-desc">
+                Tạo thông tin người dùng Shopee ngẫu nhiên: Tên, SĐT, Địa chỉ, Đơn hàng, Sản phẩm, Giá tiền và Mã vận đơn.
+            </div>
+
+            <div class="gen-area">
+                <div class="label">
+                    <span>📦 Thông tin Shopee</span>
+                    <span class="count" id="shopee-count">#0</span>
+                </div>
+                <div class="output" id="shopee-output">
+                    <span class="muted">Nhấn "Tạo thông tin" để bắt đầu</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btn-gen-shopee">🎲 Tạo thông tin</button>
+                <button class="btn btn-success" id="btn-copy-shopee">📋 Sao chép</button>
+                <button class="btn btn-secondary" id="btn-shopee-more">➕ Tạo thêm</button>
+            </div>
+
+            <div class="history-area">
+                <div class="h-title">
+                    <span>📜 Lịch sử</span>
+                    <button class="clear-btn" id="clear-shopee-history">Xóa tất cả</button>
+                </div>
+                <div class="history-list" id="shopee-history"></div>
+            </div>
+        </div>
+
     </div>
 
-    <script>
-        // Hàm tự động đọc file config.txt để thay đổi nội dung trang web
-        async function loadConfig() {
-            try {
-                const response = await fetch('config.txt');
-                if (!response.ok) {
-                    throw new Error('Không thể tải file config.txt');
-                }
-                const data = await response.json();
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
 
-                // Cập nhật dữ liệu vào giao diện HTML
-                document.getElementById('tool-logo').src = data.toolLogo || 'https://via.placeholder.com/150';
-                document.getElementById('tool-logo').alt = data.toolName;
-                document.getElementById('tool-name').innerText = data.toolName;
-                document.getElementById('tool-desc').innerText = data.toolDescription;
-                document.getElementById('tool-link').href = data.toolLink;
-                
-                // Mở khóa giao diện sau khi tải xong
-                document.getElementById('app-container').classList.remove('loading');
-            } catch (error) {
-                console.error('Lỗi cấu hình:', error);
-                document.getElementById('tool-name').innerText = "Lỗi tải cấu hình";
-                document.getElementById('tool-desc').innerText = "Hãy chắc chắn rằng bạn đã tạo file 'config.txt' đúng định dạng và đặt cùng thư mục với file HTML này.";
-            }
+    <script>
+        // ================================================================
+        //  ĐỊNH TUYẾN DỰA TRÊN PATHNAME
+        // ================================================================
+
+        const pageIntro = document.getElementById('page-intro');
+        const pageAdrr  = document.getElementById('page-adrr');
+        const pageShoppe= document.getElementById('page-shoppe');
+
+        const path = window.location.pathname;
+
+        // Ẩn tất cả, sau đó hiển thị theo path
+        pageIntro.style.display = 'none';
+        pageAdrr.classList.remove('active');
+        pageShoppe.classList.remove('active');
+
+        if (path === '/adrr') {
+            pageAdrr.classList.add('active');
+            pageAdrr.style.display = 'block';
+        } else if (path === '/shoppe') {
+            pageShoppe.classList.add('active');
+            pageShoppe.style.display = 'block';
+        } else {
+            // mặc định: trang giới thiệu
+            pageIntro.style.display = 'block';
         }
 
-        // Chạy hàm khi trang web tải xong
-        window.onload = loadConfig;
+        // ================================================================
+        //  DỮ LIỆU & HÀM DÙNG CHUNG
+        // ================================================================
+
+        const PROVINCES = [
+            'Hà Nội', 'TP. Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
+            'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu',
+            'Bắc Ninh', 'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước',
+            'Bình Thuận', 'Cà Mau', 'Cao Bằng', 'Đắk Lắk', 'Đắk Nông',
+            'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Giang',
+            'Hà Nam', 'Hà Tĩnh', 'Hải Dương', 'Hậu Giang', 'Hòa Bình',
+            'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 'Kon Tum', 'Lai Châu',
+            'Lâm Đồng', 'Lạng Sơn', 'Lào Cai', 'Long An', 'Nam Định',
+            'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên',
+            'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị',
+            'Sóc Trăng', 'Sơn La', 'Tây Ninh', 'Thái Bình', 'Thái Nguyên',
+            'Thanh Hóa', 'Thừa Thiên Huế', 'Tiền Giang', 'Trà Vinh', 'Tuyên Quang',
+            'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái'
+        ];
+
+        const DISTRICTS = [
+            'Quận 1', 'Quận 2', 'Quận 3', 'Quận 4', 'Quận 5', 'Quận 6', 'Quận 7', 'Quận 8', 'Quận 9', 'Quận 10',
+            'Quận 11', 'Quận 12', 'Bình Thạnh', 'Phú Nhuận', 'Gò Vấp', 'Tân Bình', 'Tân Phú', 'Thủ Đức',
+            'Cầu Giấy', 'Đống Đa', 'Ba Đình', 'Hoàn Kiếm', 'Hai Bà Trưng', 'Thanh Xuân', 'Hoàng Mai', 'Long Biên',
+            'Nam Từ Liêm', 'Bắc Từ Liêm', 'Hà Đông', 'Sơn Trà', 'Hải Châu', 'Cẩm Lệ', 'Ngũ Hành Sơn',
+            'Thanh Khê', 'Liên Chiểu', 'Ninh Kiều', 'Bình Thủy', 'Cái Răng', 'Ô Môn', 'Thốt Nốt'
+        ];
+
+        const WARDS = [
+            'Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10',
+            'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14', 'Phường 15', 'Phường 16', 'Phường 17', 'Phường 18', 'Phường 19', 'Phường 20',
+            'Phường 21', 'Phường 22', 'Phường 23', 'Phường 24', 'Phường 25', 'Phường 26', 'Phường 27', 'Phường 28', 'Phường 29', 'Phường 30',
+            'Xã An Phú', 'Xã Bình An', 'Xã Phú Mỹ', 'Xã Tân Phú', 'Xã Hòa Khánh', 'Xã Hòa Phú', 'Xã Hòa Xuân', 'Xã Hòa Thọ',
+            'Xã Hòa Châu', 'Xã Hòa Phong', 'Xã Hòa Nhơn', 'Xã Hòa Tiến', 'Xã Hòa Sơn', 'Xã Hòa Liên'
+        ];
+
+        const STREETS = [
+            'Nguyễn Huệ', 'Lê Lợi', 'Trần Hưng Đạo', 'Phạm Ngũ Lão', 'Võ Văn Tần',
+            'Nguyễn Đình Chiểu', 'Hai Bà Trưng', 'Lý Thường Kiệt', 'Trần Phú', 'Lê Duẩn',
+            'Nguyễn Thái Học', 'Lý Tự Trọng', 'Trần Quốc Thảo', 'Cách Mạng Tháng 8',
+            'Phan Đình Phùng', 'Nguyễn Trãi', 'Trường Chinh', 'Xô Viết Nghệ Tĩnh',
+            'Điện Biên Phủ', 'Võ Nguyên Giáp', 'Nguyễn Văn Cừ', 'Hoàng Diệu',
+            'Phan Bội Châu', 'Lê Hồng Phong', 'Nguyễn Du', 'Trần Bình Trọng',
+            'Lê Quý Đôn', 'Ngô Quyền', 'Trần Nhân Tông', 'Lý Nam Đế'
+        ];
+
+        const SHOPEE_NAMES = [
+            'Nguyễn Văn An', 'Trần Thị Bình', 'Lê Hoàng Cường', 'Phạm Minh Dũng',
+            'Vũ Thanh Hà', 'Hoàng Thu Hương', 'Đặng Quốc Khánh', 'Ngô Thị Lan',
+            'Bùi Văn Mạnh', 'Đỗ Thị Ngọc', 'Hồ Văn Phúc', 'Lý Thị Quyên',
+            'Trương Quang Sáng', 'Nguyễn Thị Tâm', 'Phan Văn Thành', 'Lưu Thị Thúy',
+            'Mai Văn Tiến', 'Huỳnh Thị Trang', 'Nguyễn Đức Trung', 'Trịnh Thị Tuyết'
+        ];
+
+        const SHOPEE_PRODUCTS = [
+            'Áo thun Polo', 'Quần jean nam', 'Đầm dự tiệc', 'Giày thể thao', 'Túi xách nữ',
+            'Đồng hồ thông minh', 'Tai nghe Bluetooth', 'Bộ nồi chảo', 'Máy lọc không khí',
+            'Set kem dưỡng da', 'Balo du lịch', 'Áo khoác gió', 'Váy công sở', 'Quần tây nam',
+            'Kính râm', 'Sạc dự phòng', 'Bàn phím cơ', 'Chuột không dây', 'Nồi chiên không dầu'
+        ];
+
+        function randomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // ================================================================
+        //  ADDRESS GENERATOR
+        // ================================================================
+
+        let addrHistory = [];
+        let addrCount = 0;
+
+        function generateAddress() {
+            const province = randomItem(PROVINCES);
+            const district = randomItem(DISTRICTS);
+            const ward = randomItem(WARDS);
+            const street = randomItem(STREETS);
+            const house = randomInt(1, 999);
+            const postal = randomInt(10000, 99999);
+            return {
+                full: `${house} ${street}, ${ward}, ${district}, ${province}`,
+                house, street, ward, district, province, postal
+            };
+        }
+
+        function renderAddress(data) {
+            return `${data.house} ${data.street}, ${data.ward}, ${data.district}, ${data.province}  •  Mã: ${data.postal}`;
+        }
+
+        function addAddressToHistory(addr) {
+            addrHistory.unshift(addr);
+            if (addrHistory.length > 20) addrHistory.pop();
+            renderAddrHistory();
+            addrCount++;
+            document.getElementById('addr-count').textContent = '#' + addrCount;
+        }
+
+        function renderAddrHistory() {
+            const container = document.getElementById('addr-history');
+            container.innerHTML = addrHistory.map((item, idx) => `
+                <div class="history-item">
+                    <span class="h-text">${renderAddress(item)}</span>
+                    <span class="h-time">#${addrHistory.length - idx}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateAddrOutput(data) {
+            document.getElementById('addr-output').innerHTML = renderAddress(data);
+        }
+
+        // Sự kiện
+        document.getElementById('btn-gen-addr').addEventListener('click', function() {
+            const addr = generateAddress();
+            addAddressToHistory(addr);
+            updateAddrOutput(addr);
+        });
+
+        document.getElementById('btn-addr-more').addEventListener('click', function() {
+            for (let i = 0; i < 5; i++) {
+                const addr = generateAddress();
+                addAddressToHistory(addr);
+                if (i === 4) updateAddrOutput(addr);
+            }
+        });
+
+        document.getElementById('btn-copy-addr').addEventListener('click', function() {
+            const output = document.getElementById('addr-output').innerText;
+            if (output && !output.includes('Nhấn "Tạo địa chỉ"')) {
+                navigator.clipboard.writeText(output).then(() => {
+                    showToast('✅ Đã sao chép địa chỉ!');
+                }).catch(() => {
+                    showToast('❌ Không thể sao chép');
+                });
+            } else {
+                showToast('⚠️ Hãy tạo địa chỉ trước');
+            }
+        });
+
+        document.getElementById('clear-addr-history').addEventListener('click', function() {
+            addrHistory = [];
+            renderAddrHistory();
+            document.getElementById('addr-output').innerHTML = `<span class="muted">Đã xóa lịch sử</span>`;
+            showToast('🗑️ Đã xóa lịch sử');
+        });
+
+        // ================================================================
+        //  SHOPEE GENERATOR
+        // ================================================================
+
+        let shopeeHistory = [];
+        let shopeeCount = 0;
+
+        function generateShopee() {
+            const name = randomItem(SHOPEE_NAMES);
+            const phone = `0${randomInt(3,9)}${randomInt(10000000, 99999999)}`;
+            const address = generateAddress();
+            const product = randomItem(SHOPEE_PRODUCTS);
+            const price = randomInt(50000, 1500000);
+            const orderId = `SH${randomInt(100000, 999999)}`;
+            return {
+                name, phone,
+                address: address.full,
+                product, price,
+                orderId
+            };
+        }
+
+        function renderShopee(data) {
+            return `
+                👤 ${data.name}  •  📞 ${data.phone}
+                <span class="sub">📍 ${data.address}</span>
+                <span class="sub">📦 ${data.product}  •  💰 ${data.price.toLocaleString()}đ  •  Mã ĐH: ${data.orderId}</span>
+            `;
+        }
+
+        function addShopeeToHistory(item) {
+            shopeeHistory.unshift(item);
+            if (shopeeHistory.length > 20) shopeeHistory.pop();
+            renderShopeeHistory();
+            shopeeCount++;
+            document.getElementById('shopee-count').textContent = '#' + shopeeCount;
+        }
+
+        function renderShopeeHistory() {
+            const container = document.getElementById('shopee-history');
+            container.innerHTML = shopeeHistory.map((item, idx) => `
+                <div class="history-item">
+                    <span class="h-text">${item.name} - ${item.product} (${item.price.toLocaleString()}đ)</span>
+                    <span class="h-time">#${shopeeHistory.length - idx}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateShopeeOutput(data) {
+            document.getElementById('shopee-output').innerHTML = renderShopee(data);
+        }
+
+        // Sự kiện
+        document.getElementById('btn-gen-shopee').addEventListener('click', function() {
+            const data = generateShopee();
+            addShopeeToHistory(data);
+            updateShopeeOutput(data);
+        });
+
+        document.getElementById('btn-shopee-more').addEventListener('click', function() {
+            for (let i = 0; i < 5; i++) {
+                const data = generateShopee();
+                addShopeeToHistory(data);
+                if (i === 4) updateShopeeOutput(data);
+            }
+        });
+
+        document.getElementById('btn-copy-shopee').addEventListener('click', function() {
+            const output = document.getElementById('shopee-output').innerText;
+            if (output && !output.includes('Nhấn "Tạo thông tin"')) {
+                navigator.clipboard.writeText(output).then(() => {
+                    showToast('✅ Đã sao chép thông tin!');
+                }).catch(() => {
+                    showToast('❌ Không thể sao chép');
+                });
+            } else {
+                showToast('⚠️ Hãy tạo thông tin trước');
+            }
+        });
+
+        document.getElementById('clear-shopee-history').addEventListener('click', function() {
+            shopeeHistory = [];
+            renderShopeeHistory();
+            document.getElementById('shopee-output').innerHTML = `<span class="muted">Đã xóa lịch sử</span>`;
+            showToast('🗑️ Đã xóa lịch sử');
+        });
+
+        // ================================================================
+        //  TOAST UTILITY
+        // ================================================================
+
+        let toastTimeout;
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // ================================================================
+        //  KHỞI TẠO – TẠO SẴN MỘT VÀI DỮ LIỆU MẪU KHI VÀO TOOL
+        // ================================================================
+
+        // Nếu đang ở trang Address, tạo sẵn 1 địa chỉ
+        if (path === '/adrr') {
+            const sample = generateAddress();
+            addAddressToHistory(sample);
+            updateAddrOutput(sample);
+        }
+
+        // Nếu đang ở trang Shopee, tạo sẵn 1 thông tin
+        if (path === '/shoppe') {
+            const sample = generateShopee();
+            addShopeeToHistory(sample);
+            updateShopeeOutput(sample);
+        }
     </script>
 </body>
 </html>
