@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Address Generator Pro</title>
+    <title>Variant Generator Pro</title>
     <style>
         :root {
             --primary-color: #ee4d2d;
@@ -78,7 +78,7 @@
         button.btn-copy:active { background: #e0e0e0; }
         .checkbox-group {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             margin: 15px 0;
             padding: 10px;
             background: #fff9f8;
@@ -152,22 +152,32 @@
 <div id="toast" class="toast"></div>
 
 <div class="container">
-    <h2>Address Generator</h2>
+    <h2>Variant Generator</h2>
 
     <div class="section-title">Dữ Liệu Gốc Vào</div>
+    
+    <div class="form-group">
+        <label>Tên người nhận gốc: <span style="color:#aaa"></span></label>
+        <input type="text" id="source_name" class="input-source" placeholder="Ví dụ: Nguyễn Văn A">
+        <div class="hint">Nhập họ và tên vào hoặc để trống.</div>
+    </div>
+
     <div class="form-group">
         <label>Số điện thoại gốc: <span style="color:#ee4d2d">*</span></label>
         <input type="text" id="source_phone" class="input-source" placeholder="Ví dụ: 0123456789">
-        <div class="hint">Bắt buộc nhập. Nếu để trống sẽ tự sinh SĐT ngẫu nhiên để test.</div>
+        <div class="hint">Nhập số điện thoại cần tạo biến thể.</div>
     </div>
 
     <div class="form-group">
         <label>Địa chỉ / Số nhà gốc: <span style="color:#aaa">(tuỳ chọn)</span></label>
         <input type="text" id="source_address" class="input-source" placeholder="Ví dụ: 33/11 Cống Ông Trải">
-        <div class="hint">Có thể bỏ trống nếu chỉ cần biến tấu SĐT.</div>
+        <div class="hint">Có thể bỏ trống nếu không cần dòng địa chỉ</div>
     </div>
 
     <div class="checkbox-group">
+        <label class="checkbox-label">
+            <input type="checkbox" id="opt_tweak_name" checked> Biến tấu Tên
+        </label>
         <label class="checkbox-label">
             <input type="checkbox" id="opt_note_phone" checked> Kèm cấu trúc Note SĐT
         </label>
@@ -176,12 +186,20 @@
         </label>
     </div>
 
-    <button class="btn-main" onclick="processBypassAi()">Bắt Đầu</button>
+    <button class="btn-main" onclick="processBypassAi()">Start Create</button>
 
     <div class="section-title">Kết Quả</div>
 
+    <div class="form-group result-block" id="block_tweaked_name">
+        <label>Tên Người Nhận Biến Tấu:</label>
+        <div class="input-group">
+            <input type="text" id="res_tweaked_name" class="has-btn" readonly style="color:#2e7d32; font-weight:bold;" placeholder="Tên sau khi biến thể...">
+            <button class="btn-copy" onclick="copyText('res_tweaked_name')">Copy</button>
+        </div>
+    </div>
+
     <div class="form-group result-block" id="block_phone_note">
-        <label>Cụm Note SĐT Biến Tấu Hoàn Chỉnh:</label>
+        <label>Note SĐT Biến Tấu Hoàn Chỉnh:</label>
         <div class="input-group">
             <input type="text" id="res_phone_note" class="has-btn" readonly style="color:#e65100; font-weight:bold;" placeholder="VD: [Liên hệ trực tiếp 0123_456_789]">
             <button class="btn-copy" onclick="copyText('res_phone_note')">Copy</button>
@@ -194,7 +212,7 @@
             <input type="text" id="res_full_address" class="has-btn" readonly style="color:#222; font-weight:500;" placeholder="Địa chỉ sau khi lồng cụm Note...">
             <button class="btn-copy" onclick="copyText('res_full_address')">Copy</button>
         </div>
-        <div class="hint" id="addr_hint" style="display:none;">Nhập địa chỉ</div>
+        <div class="hint" id="addr_hint" style="display:none;">Nhập địa chỉ để sinh đường dẫn đầy đủ</div>
     </div>
 </div>
 
@@ -241,16 +259,25 @@
         return dict[char] || char;
     }
 
-    function generateTweakedPhone(srcPhone) {
+    // Phân tách chuỗi SĐT gốc thành cấu trúc cơ bản
+    function getCleanPhoneParts(srcPhone) {
         let clean = (srcPhone || '').replace(/\D/g, '');
         if (clean.length < 9) {
             clean = "0" + Math.floor(300000000 + Math.random() * 699999999);
-            showToast("Phát hiện trống/SĐT lỗi! Đã tự sinh số ngẫu nhiên.");
         }
+        return {
+            full: clean,
+            s1: clean.slice(0, 4),
+            s2: clean.slice(4, 7),
+            s3: clean.slice(7)
+        };
+    }
 
-        let s1 = clean.slice(0, 4);
-        let s2 = clean.slice(4, 7);
-        let s3 = clean.slice(7);
+    function generateTweakedPhone(cleanParts) {
+        let s1 = cleanParts.s1;
+        let s2 = cleanParts.s2;
+        let s3 = cleanParts.s3;
+        let clean = cleanParts.full;
 
         let circledS1 = s1.split('').map(c => visualHomoglyphTweak(c)).join('');
         let circledS2 = s2.split('').map(c => visualHomoglyphTweak(c)).join('');
@@ -279,8 +306,53 @@
             `không chín ${clean.substring(2,5)} ${clean.substring(5)}`
         ];
 
-        // Trả về ngẫu nhiên một kiểu và bọc thêm khoảng trống vô hình chống quét sâu
         return insertZeroWidthSpace(getRandom(styles));
+    }
+
+    // CỐ ĐỊNH LỖI CÚ PHÁP: Thêm khai báo hàm generateTweakedName đúng chuẩn
+    function generateTweakedName(name, cleanParts) {
+        if (!name) return ""; // Nếu bỏ trống tên thì trả về rỗng, không sinh bừa
+
+        // Tách các từ trong tên
+        let words = name.split(/\s+/).filter(w => w.length > 0);
+        if (words.length === 0) return "";
+
+        let firstName = words[words.length - 1]; // Tên chính (Quang)
+        let lastName = words[0]; // Họ (Phạm)
+        let midName = words.slice(1, words.length - 1).join(' '); // Tên đệm (Huỳnh)
+
+        let s1 = cleanParts.s1;
+        let s2 = cleanParts.s2;
+        let s3 = cleanParts.s3;
+        let pFull = cleanParts.full;
+
+        // Nhân đôi ký tự cuối cho sinh động
+        let doubleFirstChar = firstName + firstName[firstName.length - 1].repeat(getRandom([1, 2, 4]));
+        let doubleLastChar = lastName + lastName[lastName.length - 1].repeat(getRandom([0, 1]));
+        
+        let doubleMidChar = "";
+        if(midName) {
+            doubleMidChar = midName + midName[midName.length - 1].repeat(getRandom([0, 1]));
+        }
+
+        // Các biến thể tên linh hoạt
+        let nameVariants = [
+            `${firstName} ${getRandom(['02', '03', '99', '24h', 'pro', 'vip'])}`,
+            `${lastName} ${doubleFirstChar}`,
+            `${doubleFirstChar} ${midName ? midName : ''}`.trim(),
+            `${firstName} ${midName ? midName : lastName}`,
+            `${firstName} [${s1}_${s2}_${s3}]`,
+            `${lastName} ${firstName}(${pFull.substring(0,3)}...${pFull.substring(3,6)}...${pFull.substring(6)})`,
+            `${firstName}(${s1}_${s2.substring(0,2)}_${s2.substring(2)}${s3.substring(0,1)}_${s3.substring(1)})`,
+            `${firstName} ${lastName}y`,
+            `${firstName}_${pFull.slice(-4)}`,
+            `A ${firstName} (${s1})`,
+            `${lastName} ${midName ? midName + ' ' : ''}${firstName} gọj`,
+            `${firstName}(${pFull})`,
+            `${lastName} ${firstName}(${pFull})`
+        ];
+
+        return getRandom(nameVariants);
     }
 
     function tweakStreetAddress(srcAddr) {
@@ -351,15 +423,34 @@
     }
 
     function processBypassAi() {
+        let nameInput  = document.getElementById("source_name").value.trim();
         let phoneInput = document.getElementById("source_phone").value.trim();
         let addrInput  = document.getElementById("source_address").value.trim();
 
+        let isNameChecked  = document.getElementById("opt_tweak_name").checked;
         let isNoteChecked  = document.getElementById("opt_note_phone").checked;
         let isBrandChecked = document.getElementById("opt_random_brand").checked;
 
-        let rawTweakedPhone = generateTweakedPhone(phoneInput);
-        let fullNotePhoneStr = isNoteChecked ? buildFullNoteStructure(rawTweakedPhone) : rawTweakedPhone;
+        if (!phoneInput) {
+            showToast("Vui lòng nhập Số điện thoại gốc!");
+            return;
+        }
 
+        let cleanParts = getCleanPhoneParts(phoneInput);
+
+        // 1. Xử lý tên người nhận (Nếu không nhập tên thì ô kết quả sẽ trống hoàn toàn)
+        let tweakedName = "";
+        if (nameInput) {
+            tweakedName = isNameChecked ? generateTweakedName(nameInput, cleanParts) : nameInput;
+        }
+        document.getElementById("res_tweaked_name").value = tweakedName;
+
+        // 2. Xử lý phần ghi chú SĐT
+        let rawTweakedPhone = generateTweakedPhone(cleanParts);
+        let fullNotePhoneStr = isNoteChecked ? buildFullNoteStructure(rawTweakedPhone) : rawTweakedPhone;
+        document.getElementById("res_phone_note").value = fullNotePhoneStr;
+
+        // 3. Xử lý Địa chỉ đầy đủ
         let streetTweaked = tweakStreetAddress(addrInput);
         let hasAddress = streetTweaked.length > 0;
 
@@ -368,20 +459,20 @@
             let prefixBrandStr = isBrandChecked ? `(${getRandom(brands)} ${getRandom(names)}) ` : "";
             finalFullAddress = `${prefixBrandStr}${streetTweaked} ${isNoteChecked ? fullNotePhoneStr : ''}`.trim();
         } else {
+            // Nếu không nhập địa chỉ gốc, trả thẳng cụm SĐT biến tấu ra ô địa chỉ hệ thống luôn
             finalFullAddress = fullNotePhoneStr;
         }
 
-        document.getElementById("res_phone_note").value = fullNotePhoneStr;
         document.getElementById("res_full_address").value = finalFullAddress;
         document.getElementById("addr_hint").style.display = hasAddress ? "none" : "block";
 
-        showToast(hasAddress ? "Đã tạo xong địa chỉ + SĐT!" : "Thành Công!");
+        showToast("Xử lý thành công!");
     }
 
     function copyText(id) {
         let el = document.getElementById(id);
         if (!el.value) {
-            showToast("Chưa có nội dung để copy!");
+            showToast("Không có nội dung để sao chép!");
             return;
         }
         el.select();
