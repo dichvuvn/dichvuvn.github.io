@@ -283,91 +283,62 @@
         return result;
     }
 
-    // THUẬT TOÁN ĐẢO CHIỀU TỰ NHIÊN ĐỊA CHỈ & TỰ ĐỘNG CHÈN DẤU NGẪU NHIÊN
+    // THUẬT TOÁN ĐẢO CHIỀU NGẪU NHIÊN ĐỊA CHỈ THEO YÊU CẦU MỚI
     function reverseAndTweakAddress(srcAddr) {
         let addr = (srcAddr || '').trim();
         if (!addr) return '';
 
         // Tách theo phân cấp hành chính (dấu phẩy)
         let parts = addr.split(',').map(p => p.trim()).filter(p => p.length > 0);
-        let streetPart = parts[0]; // Thông thường là phần số nhà + tên đường (Ví dụ: "33/11 Cống Trải")
+        if (parts.length === 0) return '';
 
-        // 1. Xử lý phần số nhà và tên đường trước (Đảo chiều thông minh và thêm dấu)
-        let processedStreet = streetPart;
-        let slashRegex = /^(\d+[\w]*\/\d+[\w]*|\d+)\s+(.+)$/i; // Nhận dạng "33/11 Cống Trải" hoặc "33 Cống Trải"
+        let streetPart = parts[0]; // Thông thường là phần số nhà + tên đường
+        let houseNum = '';
+        let streetName = streetPart;
 
-        if (slashRegex.test(streetPart)) {
-            let match = streetPart.match(slashRegex);
-            let num = match[1]; // "33/11" hoặc "33"
-            let streetName = match[2]; // "Cống Trải"
-
-            // Các kiểu liên kết ngẫu nhiên tạo độ tự nhiên tối đa
-            let separators = [
-                `, số `, 
-                `. nhà `, 
-                ` số `, 
-                ` `, 
-                ` - hẻm `, 
-                ` hẻm `, 
-                ` / số nhà `
-            ];
-            let sep = getRandom(separators);
-
-            // Các kiểu hoán đổi vị trí tự nhiên
-            let streetVariants = [
-                `Đường ${streetName}${sep}${num}`,
-                `Phố ${streetName}${sep}${num}`,
-                `${streetName}${sep}${num}`,
-                `${streetName} (số ${num})`,
-                `${streetName} - ${num}`
-            ];
-            processedStreet = getRandom(streetVariants);
+        // Nhận dạng số nhà (ví dụ: "33/11", "33", "12A")
+        let numRegex = /^(\d+[\w]*\/\d+[\w]*|\d+[A-Za-z]?)\s+(.+)$/i;
+        if (numRegex.test(streetPart)) {
+            let match = streetPart.match(numRegex);
+            houseNum = match[1]; // "33/11"
+            streetName = match[2]; // "Cống Trải"
         }
 
-        // Cập nhật lại phần đường đã được đảo chiều tự nhiên vào mảng địa chỉ
-        parts[0] = processedStreet;
+        let adminParts = parts.slice(1); // Phường, Quận, Tỉnh...
+        let reversedAdminParts = [...adminParts].reverse(); // Đảo ngược thứ tự hành chính
+        let variants = [];
 
-        // 2. Viết tắt đơn vị hành chính ngẫu nhiên
-        const formatAdminUnits = (text) => {
-            let t = text;
-            const replaceRules = [
-                { pattern: /(phường|Phường)/gi, replacements: ['P.', 'Phg', 'P'] },
-                { pattern: /(quận|Quận)/gi, replacements: ['Q.', 'Q', 'Quận'] },
-                { pattern: /(thành phố|Thành phố|Thành Phố)/gi, replacements: ['TP.', 'TP', 'T.Phố'] },
-                { pattern: /(huyện|Huyện)/gi, replacements: ['H.', 'H', 'Huyện'] },
-                { pattern: /(tỉnh|Tỉnh)/gi, replacements: ['T.', 'Tỉnh'] }
-            ];
+        // Biến thể 1: 33/11 cống trải, hậu giang, vị thanh (Giữ nguyên số nhà+đường, đảo ngược phần hành chính)
+        variants.push([streetPart, ...reversedAdminParts].join(', '));
 
-            replaceRules.forEach(rule => {
-                if (rule.pattern.test(t)) {
-                    t = t.replace(rule.pattern, getRandom(rule.replacements));
-                }
-            });
-            return t;
-        };
+        if (houseNum) {
+            // Biến thể 2: cống trải, hậu giang, vị thanh, 33/11 (Tên đường lên đầu, số nhà đẩy xuống cuối)
+            variants.push([streetName, ...reversedAdminParts, houseNum].join(', '));
 
-        parts = parts.map(p => formatAdminUnits(p));
+            // Biến thể 3: cống trải, 33/11, hậu giang, vị thanh (Tách riêng số nhà chèn giữa)
+            variants.push([streetName, houseNum, ...reversedAdminParts].join(', '));
 
-        // 3. Đảo chiều toàn cục (Nếu bật tùy chọn) và nối chuỗi bằng ký tự ngẫu nhiên (dấu phẩy, dấu chấm)
-        let finalAddr = '';
-        let hasReverse = document.getElementById("opt_reverse_addr").checked;
-        let pJoin = getRandom([', ', '. ', ' - ', ' / ']); // Ngẫu nhiên dùng dấu chấm hoặc phẩy để nối
-
-        if (hasReverse && parts.length >= 3) {
-            let roll = Math.random();
-            if (roll < 0.5) {
-                // Cách 1: Đảo ngược từ lớn đến bé (TP. HCM -> Q. Tân Phú -> P. Phú Thạnh -> Cống Trải, 33/11)
-                finalAddr = parts.reverse().join(pJoin);
+            // Biến thể 4: trải, hậu giang, vị thanh, (33/11) (Lấy chữ cuối của tên đường, số nhà bỏ ngoặc cuối câu)
+            let streetWords = streetName.split(' ');
+            if (streetWords.length > 1) {
+                let lastWord = streetWords.pop(); // Lấy chữ "trải", bỏ chữ "cống"
+                variants.push([lastWord, ...reversedAdminParts, `(${houseNum})`].join(', '));
             } else {
-                // Cách 2: Đưa Phường/Quận lên đầu, sau đó tới Tên đường, rồi tới Tỉnh/Thành phố cuối cùng
-                let city = parts.pop();
-                let street = parts.shift();
-                finalAddr = `${parts.join(pJoin)}${pJoin}${street}${pJoin}${city}`;
+                // Nếu tên đường chỉ có 1 chữ
+                variants.push([streetName, ...reversedAdminParts, `(${houseNum})`].join(', '));
             }
         } else {
-            // Giữ nguyên cấu trúc nhưng thay thế các dấu nối ngẫu nhiên tự nhiên
-            finalAddr = parts.join(pJoin);
+            // Nếu không nhận diện được số nhà, chỉ đảo ngược các phần đơn thuần
+            let roll = Math.random();
+            if (roll < 0.5 && parts.length > 1) {
+                variants.push([...adminParts, streetPart].join(', ')); 
+            } else {
+                variants.push(parts.reverse().join(', '));
+            }
         }
+
+        // Chọn ngẫu nhiên 1 trong các biến thể trên
+        let finalAddr = getRandom(variants);
 
         // Áp dụng chèn khoảng trắng tàng hình Shopee Bypass nếu được bật
         if (document.getElementById("opt_shopee_bypass").checked) {
