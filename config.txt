@@ -1,6 +1,0 @@
-{
-  "toolName": "Công cụ Hỗ trợ Shopee Bán Hàng",
-  "toolLogo": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg",
-  "toolLink": "/shoppe",
-  "toolDescription": "Hệ thống tối ưu hóa gian hàng, tăng đơn hàng tự động và quản lý doanh thu Shopee hiệu quả nhất hiện nay."
-}
