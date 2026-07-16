@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Variant Generator Pro</title>
+    <title>Variant Generator</title>
     <style>
         :root {
             --primary-color: #ee4d2d;
@@ -152,12 +152,12 @@
 <div id="toast" class="toast"></div>
 
 <div class="container">
-    <h2>Variant Generator</h2>
+    <h2>Variant Generator Pro</h2>
 
     <div class="section-title">Dữ Liệu Gốc Vào</div>
     
     <div class="form-group">
-        <label>Tên người nhận gốc: <span style="color:#aaa"></span></label>
+        <label>Tên người nhận gốc:</label>
         <input type="text" id="source_name" class="input-source" placeholder="Ví dụ: Nguyễn Văn A">
         <div class="hint">Nhập họ và tên vào hoặc để trống.</div>
     </div>
@@ -165,51 +165,51 @@
     <div class="form-group">
         <label>Số điện thoại gốc: <span style="color:#ee4d2d">*</span></label>
         <input type="text" id="source_phone" class="input-source" placeholder="Ví dụ: 0123456789">
-        <div class="hint">Nhập số điện thoại cần tạo biến thể.</div>
+        <div class="hint">Nhập số điện thoại gốc</div>
     </div>
 
     <div class="form-group">
         <label>Địa chỉ / Số nhà gốc: <span style="color:#aaa">(tuỳ chọn)</span></label>
-        <input type="text" id="source_address" class="input-source" placeholder="Ví dụ: 33/11 Cống Ông Trải">
-        <div class="hint">Có thể bỏ trống nếu không cần dòng địa chỉ</div>
+        <input type="text" id="source_address" class="input-source" placeholder="Ví dụ: 33/11 Cống Trải, Phường Phú Thạnh, Quận Tân Phú, TP. HCM">
+        <div class="hint">Nhập địa chỉ (số nhà + tên đường) để đảo chiều tự nhiên.</div>
     </div>
 
     <div class="checkbox-group">
         <label class="checkbox-label">
             <input type="checkbox" id="opt_tweak_name" checked> Biến tấu Tên
         </label>
-        <label class="checkbox-label">
-            <input type="checkbox" id="opt_note_phone" checked> Kèm cấu trúc Note SĐT
+        <label class="checkbox-label" title="Số điện thoại đan xen chữ, homoglyph và ký tự vô hình">
+            <input type="checkbox" id="opt_shopee_bypass" checked> Note SĐT vào địa chỉ
         </label>
-        <label class="checkbox-label">
-            <input type="checkbox" id="opt_random_brand" checked> Thêm tên Cửa Hàng giả lập
+        <label class="checkbox-label" title="Đảo chiều số nhà và đường một cách tự nhiên">
+            <input type="checkbox" id="opt_reverse_addr" checked> Đảo chiều Địa chỉ
         </label>
     </div>
 
-    <button class="btn-main" onclick="processBypassAi()">Start Create</button>
+    <button class="btn-main" onclick="processBypassAi()">Bắt Đầu Tạo Biến Thể</button>
 
     <div class="section-title">Kết Quả</div>
 
     <div class="form-group result-block" id="block_tweaked_name">
         <label>Tên Người Nhận Biến Tấu:</label>
         <div class="input-group">
-            <input type="text" id="res_tweaked_name" class="has-btn" readonly style="color:#2e7d32; font-weight:bold;" placeholder="Tên sau khi biến thể...">
+            <input type="text" id="res_tweaked_name" class="has-btn" readonly style="color:#2e7d32; font-weight:bold;" placeholder="Chưa có dữ liệu...">
             <button class="btn-copy" onclick="copyText('res_tweaked_name')">Copy</button>
         </div>
     </div>
 
     <div class="form-group result-block" id="block_phone_note">
-        <label>Note SĐT Biến Tấu Hoàn Chỉnh:</label>
+        <label>Note SĐT:</label>
         <div class="input-group">
-            <input type="text" id="res_phone_note" class="has-btn" readonly style="color:#e65100; font-weight:bold;" placeholder="VD: [Liên hệ trực tiếp 0123_456_789]">
+            <input type="text" id="res_phone_note" class="has-btn" readonly style="color:#e65100; font-weight:bold;" placeholder="Chưa có dữ liệu...">
             <button class="btn-copy" onclick="copyText('res_phone_note')">Copy</button>
         </div>
     </div>
 
     <div class="form-group result-block" id="block_full_address">
-        <label>Dòng Địa Chỉ Đầy Đủ (Gửi lên hệ thống):</label>
+        <label>Dòng Địa Đã Chỉnh:</label>
         <div class="input-group">
-            <input type="text" id="res_full_address" class="has-btn" readonly style="color:#222; font-weight:500;" placeholder="Địa chỉ sau khi lồng cụm Note...">
+            <input type="text" id="res_full_address" class="has-btn" readonly style="color:#222; font-weight:500;" placeholder="Chưa có dữ liệu...">
             <button class="btn-copy" onclick="copyText('res_full_address')">Copy</button>
         </div>
         <div class="hint" id="addr_hint" style="display:none;">Nhập địa chỉ để sinh đường dẫn đầy đủ</div>
@@ -217,8 +217,8 @@
 </div>
 
 <script>
-    const brands = ["Tạp Hóa", "Shop", "Cửa Hàng", "Đại Lý", "Tiệm Sửa Xe", "Salon", "Quán Ăn", "Tiệm Điện Thoại", "Điện Máy", "Tiệm Bánh"];
-    const names = ["Lan", "Hùng", "Mai", "Tuấn", "Thanh", "Vinh", "Mỹ", "Phượng", "Đức", "Khánh", "An", "Thịnh", "Mini", "24h"];
+    const brands = ["Tạp Hóa", "Shop", "Cửa Hàng", "Đại Lý", "Salon", "Quán Ăn", "Tiệm Điện Thoại", "Điện Máy", "Tiệm Bánh", "Cửa Tiệm", "MiniMart"];
+    const names = ["Lan", "Hùng", "Mai", "Tuấn", "Thanh", "Vinh", "Mỹ", "Phượng", "Đức", "Khánh", "An", "Thịnh", "Vy", "Hà", "Linh"];
 
     function getRandom(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
@@ -232,192 +232,264 @@
         t._timer = setTimeout(() => { t.style.display = "none"; }, 1500);
     }
 
-    // Tận dụng ký tự khoảng trống vô hình xen kẽ để bẻ gãy bộ quét chuỗi AI
-    function insertZeroWidthSpace(str) {
-        return str.split('').join('\u200B');
+    // Chèn ký tự phân tách tàng hình (Zero-Width Non-Joiner) để AI không quét được text liên tục
+    function insertInvisibleBypass(str) {
+        const invisibleChars = ['\u200C', '\u200D', '\u2060'];
+        return str.split('').map(char => {
+            return char + (Math.random() > 0.4 ? getRandom(invisibleChars) : '');
+        }).join('');
     }
 
-    function visualHomoglyphTweak(char) {
-        if (char === '0') return getRandom(['o', 'O', '⓪']);
-        if (char === '1') return getRandom(['l', 'I', '①']);
-        if (char === '2') return '②';
-        if (char === '3') return '③';
-        if (char === '4') return '④';
-        if (char === '5') return '⑤';
-        if (char === '6') return '⑥';
-        if (char === '7') return '⑦';
-        if (char === '8') return '⑧';
-        if (char === '9') return '⑨';
-        return char;
-    }
+    // Chuyển đổi số thành chữ đồng âm shipper nhìn hiểu ngay nhưng AI quét SĐT chịu chết
+    const numToVietnameseText = {
+        '0': 'Không', '1': 'Một', '2': 'Hai', '3': 'Ba', '4': 'Bốn',
+        '5': 'Năm', '6': 'Sáu', '7': 'Bảy', '8': 'Tám', '9': 'Chín'
+    };
 
-    function numToVietnamese(char) {
-        const dict = {
-            '0': 'Không', '1': 'Một', '2': 'Hai', '3': 'Ba', '4': 'Bốn',
-            '5': 'Năm', '6': 'Sáu', '7': 'Bảy', '8': 'Tám', '9': 'Chín'
-        };
-        return dict[char] || char;
-    }
+    function generateSuperBypassPhone(srcPhone) {
+        let clean = srcPhone.replace(/\D/g, '');
+        if (clean.length < 9) return srcPhone;
 
-    // Phân tách chuỗi SĐT gốc thành cấu trúc cơ bản
-    function getCleanPhoneParts(srcPhone) {
-        let clean = (srcPhone || '').replace(/\D/g, '');
-        if (clean.length < 9) {
-            clean = "0" + Math.floor(300000000 + Math.random() * 699999999);
-        }
-        return {
-            full: clean,
-            s1: clean.slice(0, 4),
-            s2: clean.slice(4, 7),
-            s3: clean.slice(7)
-        };
-    }
+        let s1 = clean.slice(0, 4);
+        let s2 = clean.slice(4, 7);
+        let s3 = clean.slice(7);
 
-    function generateTweakedPhone(cleanParts) {
-        let s1 = cleanParts.s1;
-        let s2 = cleanParts.s2;
-        let s3 = cleanParts.s3;
-        let clean = cleanParts.full;
+        // Biến thể chữ 'o' thay số '0'
+        let homoglyphZero = clean.replace(/^0/, getRandom(['o', 'O', '⓪']));
+        let h1 = homoglyphZero.slice(0, 4);
+        let h2 = homoglyphZero.slice(4, 7);
+        let h3 = homoglyphZero.slice(7);
 
-        let circledS1 = s1.split('').map(c => visualHomoglyphTweak(c)).join('');
-        let circledS2 = s2.split('').map(c => visualHomoglyphTweak(c)).join('');
-        let circledS3 = s3.split('').map(c => visualHomoglyphTweak(c)).join('');
-
+        // Tạo phong cách hiển thị khác nhau
         let styles = [
-            `//${s1}//${s2}//${s3}//`,
-            `${circledS1} ${circledS2} ${circledS3}`,
-            `Không_${s1.substring(1)}_${s2}_${s3}`,
-            `${s1}..nhấn..${s2}..gọi..${s3}`,
-            `[${s1}]-[${s2}]-[${s3}]`,
-            `l.hệ:${s1}│${s2}│${s3}`,
-            `${numToVietnamese(clean[0])} ${numToVietnamese(clean[1])} ${numToVietnamese(clean[2])}..${s2}..${s3}`,
-            `SĐT_N_H_${s1}.${s2}.${s3}`,
-            `O${clean.substring(1,4)}★${s2}★${s3}`,
-            `${s1}..${s2}..${s3}`,
-            `${s1}_${s2}_${s3}`,
-            `${s1} ${s2} ${s3}`,
-            `${clean.split('').join('-')}`,
-            `${s1}*${s2}*${s3}`,
-            `${s1}/${s2}/${s3}`,
-            `${s1}~${s2}~${s3}`,
-            `${s1}|${s2}|${s3}`,
-            `lh:${clean.substring(0,4)}.${clean.substring(4,7)}.${clean.substring(7)}`,
-            `không ba hai ${s2} ${s3}`,
-            `không chín ${clean.substring(2,5)} ${clean.substring(5)}`
+            // Phong cách 1: Chữ hóa số đầu
+            `Không_${s1.substring(1)}.${s2}.${s3}`,
+            // Phong cách 2: Dùng chữ o thường làm số 0
+            `o${clean.substring(1,4)}_${s2}_${s3}`,
+            // Phong cách 3: Viết chữ số lẻ ở đuôi
+            `${s1}.${s2}.${s3.substring(0,2)}` + numToVietnameseText[s3.substring(2)],
+            // Phong cách 4: Trộn chữ số lẫn lộn nhưng cực kỳ trực quan
+            `${s1}..${s2}..${s3.substring(0,1)}` + numToVietnameseText[s3.substring(1,2)] + numToVietnameseText[s3.substring(2)],
+            // Phong cách 5: Ngăn cách bằng chữ cái vô nghĩa
+            `LH ${h1}a${h2}b${h3}`,
+            // Phong cách 6: Phong cách đứt nét dấu gạch ngang
+            `alo_${s1}_${s2}_${s3}`
         ];
 
-        return insertZeroWidthSpace(getRandom(styles));
+        let result = getRandom(styles);
+        if (document.getElementById("opt_shopee_bypass").checked) {
+            result = insertInvisibleBypass(result);
+        }
+        return result;
     }
 
-    // CỐ ĐỊNH LỖI CÚ PHÁP: Thêm khai báo hàm generateTweakedName đúng chuẩn
-    function generateTweakedName(name, cleanParts) {
-        if (!name) return ""; // Nếu bỏ trống tên thì trả về rỗng, không sinh bừa
+    // THUẬT TOÁN ĐẢO CHIỀU TỰ NHIÊN ĐỊA CHỈ & TỰ ĐỘNG CHÈN DẤU NGẪU NHIÊN
+    function reverseAndTweakAddress(srcAddr) {
+        let addr = (srcAddr || '').trim();
+        if (!addr) return '';
 
-        // Tách các từ trong tên
+        // Tách theo phân cấp hành chính (dấu phẩy)
+        let parts = addr.split(',').map(p => p.trim()).filter(p => p.length > 0);
+        let streetPart = parts[0]; // Thông thường là phần số nhà + tên đường (Ví dụ: "33/11 Cống Trải")
+
+        // 1. Xử lý phần số nhà và tên đường trước (Đảo chiều thông minh và thêm dấu)
+        let processedStreet = streetPart;
+        let slashRegex = /^(\d+[\w]*\/\d+[\w]*|\d+)\s+(.+)$/i; // Nhận dạng "33/11 Cống Trải" hoặc "33 Cống Trải"
+
+        if (slashRegex.test(streetPart)) {
+            let match = streetPart.match(slashRegex);
+            let num = match[1]; // "33/11" hoặc "33"
+            let streetName = match[2]; // "Cống Trải"
+
+            // Các kiểu liên kết ngẫu nhiên tạo độ tự nhiên tối đa
+            let separators = [
+                `, số `, 
+                `. nhà `, 
+                ` số `, 
+                ` `, 
+                ` - hẻm `, 
+                ` hẻm `, 
+                ` / số nhà `
+            ];
+            let sep = getRandom(separators);
+
+            // Các kiểu hoán đổi vị trí tự nhiên
+            let streetVariants = [
+                `Đường ${streetName}${sep}${num}`,
+                `Phố ${streetName}${sep}${num}`,
+                `${streetName}${sep}${num}`,
+                `${streetName} (số ${num})`,
+                `${streetName} - ${num}`
+            ];
+            processedStreet = getRandom(streetVariants);
+        }
+
+        // Cập nhật lại phần đường đã được đảo chiều tự nhiên vào mảng địa chỉ
+        parts[0] = processedStreet;
+
+        // 2. Viết tắt đơn vị hành chính ngẫu nhiên
+        const formatAdminUnits = (text) => {
+            let t = text;
+            const replaceRules = [
+                { pattern: /(phường|Phường)/gi, replacements: ['P.', 'Phg', 'P'] },
+                { pattern: /(quận|Quận)/gi, replacements: ['Q.', 'Q', 'Quận'] },
+                { pattern: /(thành phố|Thành phố|Thành Phố)/gi, replacements: ['TP.', 'TP', 'T.Phố'] },
+                { pattern: /(huyện|Huyện)/gi, replacements: ['H.', 'H', 'Huyện'] },
+                { pattern: /(tỉnh|Tỉnh)/gi, replacements: ['T.', 'Tỉnh'] }
+            ];
+
+            replaceRules.forEach(rule => {
+                if (rule.pattern.test(t)) {
+                    t = t.replace(rule.pattern, getRandom(rule.replacements));
+                }
+            });
+            return t;
+        };
+
+        parts = parts.map(p => formatAdminUnits(p));
+
+        // 3. Đảo chiều toàn cục (Nếu bật tùy chọn) và nối chuỗi bằng ký tự ngẫu nhiên (dấu phẩy, dấu chấm)
+        let finalAddr = '';
+        let hasReverse = document.getElementById("opt_reverse_addr").checked;
+        let pJoin = getRandom([', ', '. ', ' - ', ' / ']); // Ngẫu nhiên dùng dấu chấm hoặc phẩy để nối
+
+        if (hasReverse && parts.length >= 3) {
+            let roll = Math.random();
+            if (roll < 0.5) {
+                // Cách 1: Đảo ngược từ lớn đến bé (TP. HCM -> Q. Tân Phú -> P. Phú Thạnh -> Cống Trải, 33/11)
+                finalAddr = parts.reverse().join(pJoin);
+            } else {
+                // Cách 2: Đưa Phường/Quận lên đầu, sau đó tới Tên đường, rồi tới Tỉnh/Thành phố cuối cùng
+                let city = parts.pop();
+                let street = parts.shift();
+                finalAddr = `${parts.join(pJoin)}${pJoin}${street}${pJoin}${city}`;
+            }
+        } else {
+            // Giữ nguyên cấu trúc nhưng thay thế các dấu nối ngẫu nhiên tự nhiên
+            finalAddr = parts.join(pJoin);
+        }
+
+        // Áp dụng chèn khoảng trắng tàng hình Shopee Bypass nếu được bật
+        if (document.getElementById("opt_shopee_bypass").checked) {
+            finalAddr = insertInvisibleBypass(finalAddr);
+        }
+
+        return finalAddr;
+    }
+
+    function generateTweakedName(name, cleanParts) {
+        if (!name) return "";
         let words = name.split(/\s+/).filter(w => w.length > 0);
         if (words.length === 0) return "";
 
-        let firstName = words[words.length - 1]; // Tên chính (Quang)
-        let lastName = words[0]; // Họ (Phạm)
-        let midName = words.slice(1, words.length - 1).join(' '); // Tên đệm (Huỳnh)
+        let firstName = words[words.length - 1];
+        let lastName = words[0];
+        let midName = words.slice(1, words.length - 1).join(' ');
 
         let s1 = cleanParts.s1;
         let s2 = cleanParts.s2;
         let s3 = cleanParts.s3;
         let pFull = cleanParts.full;
 
-        // Nhân đôi ký tự cuối cho sinh động
-        let doubleFirstChar = firstName + firstName[firstName.length - 1].repeat(getRandom([1, 2, 4]));
-        let doubleLastChar = lastName + lastName[lastName.length - 1].repeat(getRandom([0, 1]));
+        let doubleFirstChar = firstName + firstName[firstName.length - 1].repeat(getRandom([1, 2]));
         
-        let doubleMidChar = "";
-        if(midName) {
-            doubleMidChar = midName + midName[midName.length - 1].repeat(getRandom([0, 1]));
-        }
-
-        // Các biến thể tên linh hoạt
         let nameVariants = [
-            `${firstName} ${getRandom(['02', '03', '99', '24h', 'pro', 'vip'])}`,
+            `${firstName} ${getRandom(['Shop', 'Vip', '9x', 'Store', 'Online', '02', 'Official', 'Express'])}`,
             `${lastName} ${doubleFirstChar}`,
             `${doubleFirstChar} ${midName ? midName : ''}`.trim(),
-            `${firstName} ${midName ? midName : lastName}`,
-            `${firstName} [${s1}_${s2}_${s3}]`,
-            `${lastName} ${firstName}(${pFull.substring(0,3)}...${pFull.substring(3,6)}...${pFull.substring(6)})`,
-            `${firstName}(${s1}_${s2.substring(0,2)}_${s2.substring(2)}${s3.substring(0,1)}_${s3.substring(1)})`,
-            `${firstName} ${lastName}y`,
-            `${firstName}_${pFull.slice(-4)}`,
-            `A ${firstName} (${s1})`,
-            `${lastName} ${midName ? midName + ' ' : ''}${firstName} gọj`,
-            `${firstName}(${pFull})`,
-            `${lastName} ${firstName}(${pFull})`
+            `${firstName} (${s1.substring(1)}...)`,
+            `Anh ${firstName} (${s1})`
         ];
 
-        return getRandom(nameVariants);
-    }
-
-    function tweakStreetAddress(srcAddr) {
-        let addr = (srcAddr || '').trim();
-        if (!addr) return '';
-
-        let slashRegex = /(\d+)\/(\d+)/;
-        if (slashRegex.test(addr)) {
-            let match = addr.match(slashRegex);
-            let truoc = match[1];
-            let sau = match[2];
-            let rest = addr.replace(slashRegex, '').trim();
-
-            let variants = [
-                `Số ${truoc}/${sau} ${rest}`,
-                `Hẻm ${truoc} xẹt ${sau} ${rest}`,
-                `Số ${truoc} Hẻm ${sau} ${rest}`,
-                `${truoc} xẹt ${sau} Đường ${rest}`,
-                `Vào hẻm ${truoc}/${sau} ${rest}`,
-                `Nhà số ${truoc} hẹt ${sau} ${rest}`,
-                `${truoc}/${sau} ${rest}`
-            ];
-            return getRandom(variants);
-        } else {
-            let prefixes = ["Số ", "Nhà số ", "Khu ", "", "Ngay số "];
-            return getRandom(prefixes) + addr;
+        let result = getRandom(nameVariants);
+        if (document.getElementById("opt_shopee_bypass").checked) {
+            result = insertInvisibleBypass(result);
         }
+        return result;
     }
 
     function buildFullNoteStructure(tweakedPhone) {
         let templates = [
-            `[Gọj ${tweakedPhone}]`,
-            `[Dđ ${tweakedPhone}]`,
-            `[Alô ${tweakedPhone}]`,
-            `(Gjáo gọj: ${tweakedPhone})`,
-            `(Ljên hệ: ${tweakedPhone})`,
-            `[Call_me ${tweakedPhone}]`,
-            `(_Shjp gọj: ${tweakedPhone})`,
-            `(Khg đổj số: ${tweakedPhone})`,
-            `[SĐT chính chủ: ${tweakedPhone}]`,
-            `[Hot_Line: ${tweakedPhone}]`,
-            `(_Nhận hàg alo: ${tweakedPhone})`,
-            `[LH ${tweakedPhone}]`,
-            `[Sđt ${tweakedPhone}]`,
-            `[Alo ${tweakedPhone}]`,
-            `(Giao gọi: ${tweakedPhone})`,
-            `(Liên hệ: ${tweakedPhone})`,
-            `[Call me ${tweakedPhone}]`,
-            `(Đt bàn giao: ${tweakedPhone})`,
-            `- Số ĐT: ${tweakedPhone}`,
-            `/ Phone Nhận hàng: ${tweakedPhone}`,
-            `[Gặp nhận hàng: ${tweakedPhone}]`,
-            `_Ship gọi ${tweakedPhone}`,
-            `(Không đổi số: ${tweakedPhone})`,
-            `[Mọi chi tiết gọi ${tweakedPhone}]`,
-            `[Số chính chủ: ${tweakedPhone}]`,
-            `(đt liên lạc: ${tweakedPhone})`,
-            `[Hotline ${tweakedPhone}]`,
-            `- ĐT Nhận: ${tweakedPhone}`,
-            `(Alo khi tới: ${tweakedPhone})`,
-            `[Vui lòng gọi ${tweakedPhone}]`,
-            `[Liên hệ trực tiếp ${tweakedPhone}]`,
-            `[Giao sdt${tweakedPhone} nha ship]`,
-            `[sdtnhanhang ${tweakedPhone}]`,
-            `[sdtcuadonhang ${tweakedPhone}]`
+`[Gọj ngay ${tweakedPhone}]`,
+`[Alô ${tweakedPhone}]`,
+`(L.Hệ giao hàng: ${tweakedPhone})`,
+`[Call me: ${tweakedPhone}]`,
+`[LH trực tiếp ${tweakedPhone}]`,
+`[Không đổi số: ${tweakedPhone}]`,
+`[Sđt nhận hàng: ${tweakedPhone}]`,
+`[Gọj ${tweakedPhone}]`,
+`[Dđ ${tweakedPhone}]`,
+`(Gjáo gọj: ${tweakedPhone})`,
+`(Ljên hệ: ${tweakedPhone})`,
+`[Call_me ${tweakedPhone}]`,
+`(_Shjp gọj: ${tweakedPhone})`,
+`(Khg đổj số: ${tweakedPhone})`,
+`[SĐT chính chủ: ${tweakedPhone}]`,
+`[Hot_Line: ${tweakedPhone}]`,
+`(_Nhận hàg alo: ${tweakedPhone})`,
+`[LH ${tweakedPhone}]`,
+`[Sđt ${tweakedPhone}]`,
+`[Alo ${tweakedPhone}]`,
+`(Giao gọi: ${tweakedPhone})`,
+`(Liên hệ: ${tweakedPhone})`,
+`[Call me ${tweakedPhone}]`,
+`(Đt bàn giao: ${tweakedPhone})`,
+`- Số ĐT: ${tweakedPhone}`,
+`/ Phone Nhận hàng: ${tweakedPhone}`,
+`[Gặp nhận hàng: ${tweakedPhone}]`,
+`_Ship gọi ${tweakedPhone}`,
+`(Không đổi số: ${tweakedPhone})`,
+`[Mọi chi tiết gọi ${tweakedPhone}]`,
+`[Số chính chủ: ${tweakedPhone}]`,
+`(đt liên lạc: ${tweakedPhone})`,
+`[Hotline ${tweakedPhone}]`,
+`- ĐT Nhận: ${tweakedPhone}`,
+`(Alo khi tới: ${tweakedPhone})`,
+`[Vui lòng gọi ${tweakedPhone}]`,
+`[Liên hệ trực tiếp ${tweakedPhone}]`,
+`[Giao sdt${tweakedPhone} nha ship]`,
+`[sdtnhanhang ${tweakedPhone}]`,
+`[sdtcuadonhang ${tweakedPhone}]`,
+`[SĐT nhận hàng ${tweakedPhone}]`,
+`[Số nhận ${tweakedPhone}]`,
+`[ĐT nhận ${tweakedPhone}]`,
+`[ĐT người nhận ${tweakedPhone}]`,
+`[SĐT người nhận ${tweakedPhone}]`,
+`[Liên hệ người nhận ${tweakedPhone}]`,
+`[Gọi người nhận ${tweakedPhone}]`,
+`[Alo người nhận ${tweakedPhone}]`,
+`[Gọi trước khi giao ${tweakedPhone}]`,
+`[Giao gọi ${tweakedPhone}]`,
+`[Đến nơi gọi ${tweakedPhone}]`,
+`[Tới nơi gọi ${tweakedPhone}]`,
+`[Gọi khi giao ${tweakedPhone}]`,
+`[Gọi lúc giao ${tweakedPhone}]`,
+`[Có hàng gọi ${tweakedPhone}]`,
+`[Shipper gọi ${tweakedPhone}]`,
+`[Ship gọi ${tweakedPhone}]`,
+`[Ship liên hệ ${tweakedPhone}]`,
+`[Ship alo ${tweakedPhone}]`,
+`[LH giao hàng ${tweakedPhone}]`,
+`[Liên hệ giao ${tweakedPhone}]`,
+`[ĐT giao hàng ${tweakedPhone}]`,
+`[SĐT giao hàng ${tweakedPhone}]`,
+`[Số giao hàng ${tweakedPhone}]`,
+`[SĐT chính ${tweakedPhone}]`,
+`[Số chính ${tweakedPhone}]`,
+`[Liên hệ chính ${tweakedPhone}]`,
+`[Alo số này ${tweakedPhone}]`,
+`[Gọi số này ${tweakedPhone}]`,
+`[Nhận hàng alo ${tweakedPhone}]`,
+`[Giao tới alo ${tweakedPhone}]`,
+`[Đừng đổi số ${tweakedPhone}]`,
+`[Giữ số này ${tweakedPhone}]`,
+`(SĐT nhận: ${tweakedPhone})`,
+`(Liên hệ nhận: ${tweakedPhone})`,
+`(Giao hàng gọi: ${tweakedPhone})`,
+`(Có hàng alo: ${tweakedPhone})`,
+`(Shipper LH: ${tweakedPhone})`,
+`(Số liên hệ: ${tweakedPhone})`,
+`(Phone nhận: ${tweakedPhone})`,
         ];
         return getRandom(templates);
     }
@@ -427,46 +499,54 @@
         let phoneInput = document.getElementById("source_phone").value.trim();
         let addrInput  = document.getElementById("source_address").value.trim();
 
-        let isNameChecked  = document.getElementById("opt_tweak_name").checked;
-        let isNoteChecked  = document.getElementById("opt_note_phone").checked;
-        let isBrandChecked = document.getElementById("opt_random_brand").checked;
+        let isNameChecked = document.getElementById("opt_tweak_name").checked;
+        let isBypassChecked = document.getElementById("opt_shopee_bypass").checked;
 
         if (!phoneInput) {
             showToast("Vui lòng nhập Số điện thoại gốc!");
             return;
         }
 
-        let cleanParts = getCleanPhoneParts(phoneInput);
+        // Tách số điện thoại để xử lý
+        let cleanParts = {
+            full: phoneInput.replace(/\D/g, ''),
+            s1: phoneInput.replace(/\D/g, '').slice(0, 4),
+            s2: phoneInput.replace(/\D/g, '').slice(4, 7),
+            s3: phoneInput.replace(/\D/g, '').slice(7)
+        };
 
-        // 1. Xử lý tên người nhận (Nếu không nhập tên thì ô kết quả sẽ trống hoàn toàn)
+        // 1. Xử lý tên người nhận
         let tweakedName = "";
         if (nameInput) {
             tweakedName = isNameChecked ? generateTweakedName(nameInput, cleanParts) : nameInput;
         }
         document.getElementById("res_tweaked_name").value = tweakedName;
 
-        // 2. Xử lý phần ghi chú SĐT
-        let rawTweakedPhone = generateTweakedPhone(cleanParts);
-        let fullNotePhoneStr = isNoteChecked ? buildFullNoteStructure(rawTweakedPhone) : rawTweakedPhone;
-        document.getElementById("res_phone_note").value = fullNotePhoneStr;
+        // 2. Xử lý ghi chú số điện thoại Bypass
+        let finalPhoneNote = generateSuperBypassPhone(phoneInput);
+        if (isBypassChecked) {
+            finalPhoneNote = buildFullNoteStructure(finalPhoneNote);
+        }
+        document.getElementById("res_phone_note").value = finalPhoneNote;
 
-        // 3. Xử lý Địa chỉ đầy đủ
-        let streetTweaked = tweakStreetAddress(addrInput);
-        let hasAddress = streetTweaked.length > 0;
+        // 3. Xử lý Địa chỉ đảo chiều tự nhiên
+        let processedAddress = reverseAndTweakAddress(addrInput);
+        let hasAddress = processedAddress.length > 0;
 
         let finalFullAddress = "";
         if (hasAddress) {
-            let prefixBrandStr = isBrandChecked ? `(${getRandom(brands)} ${getRandom(names)}) ` : "";
-            finalFullAddress = `${prefixBrandStr}${streetTweaked} ${isNoteChecked ? fullNotePhoneStr : ''}`.trim();
+            // Lồng thêm tên cửa hàng giả lập ngẫu nhiên ở đầu để tăng độ uy tín tránh AI nghi ngờ đơn rác
+            let prefixBrandStr = `(${getRandom(brands)} ${getRandom(names)}) `;
+            finalFullAddress = `${prefixBrandStr}${processedAddress} ${finalPhoneNote}`.trim();
         } else {
-            // Nếu không nhập địa chỉ gốc, trả thẳng cụm SĐT biến tấu ra ô địa chỉ hệ thống luôn
-            finalFullAddress = fullNotePhoneStr;
+            // Nếu không nhập địa chỉ gốc, xuất thẳng Note SĐT ra làm địa chỉ hệ thống luôn
+            finalFullAddress = finalPhoneNote;
         }
 
         document.getElementById("res_full_address").value = finalFullAddress;
         document.getElementById("addr_hint").style.display = hasAddress ? "none" : "block";
 
-        showToast("Xử lý thành công!");
+        showToast("Xử lý bypass thành công!");
     }
 
     function copyText(id) {
