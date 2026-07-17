@@ -232,15 +232,15 @@
         t._timer = setTimeout(() => { t.style.display = "none"; }, 1500);
     }
 
-    // Chèn ký tự phân tách tàng hình (Zero-Width Non-Joiner) để AI không quét được text liên tục
+    // FIX 1: Dùng Array.from(str) thay vì str.split('') để không bị đứt chữ tiếng Việt có dấu
     function insertInvisibleBypass(str) {
+        if (!str) return '';
         const invisibleChars = ['\u200C', '\u200D', '\u2060'];
-        return str.split('').map(char => {
+        return Array.from(str).map(char => {
             return char + (Math.random() > 0.4 ? getRandom(invisibleChars) : '');
         }).join('');
     }
 
-    // Chuyển đổi số thành chữ đồng âm shipper nhìn hiểu ngay nhưng AI quét SĐT chịu chết
     const numToVietnameseText = {
         '0': 'Không', '1': 'Một', '2': 'Hai', '3': 'Ba', '4': 'Bốn',
         '5': 'Năm', '6': 'Sáu', '7': 'Bảy', '8': 'Tám', '9': 'Chín'
@@ -254,25 +254,18 @@
         let s2 = clean.slice(4, 7);
         let s3 = clean.slice(7);
 
-        // Biến thể chữ 'o' thay số '0'
         let homoglyphZero = clean.replace(/^0/, getRandom(['o', 'O', '⓪']));
         let h1 = homoglyphZero.slice(0, 4);
         let h2 = homoglyphZero.slice(4, 7);
         let h3 = homoglyphZero.slice(7);
 
-        // Tạo phong cách hiển thị khác nhau
+        // FIX 2: Thêm fallback || '' để chống lỗi in ra chữ "undefined" nếu s3 không đủ độ dài
         let styles = [
-            // Phong cách 1: Chữ hóa số đầu
             `Không_${s1.substring(1)}.${s2}.${s3}`,
-            // Phong cách 2: Dùng chữ o thường làm số 0
             `o${clean.substring(1,4)}_${s2}_${s3}`,
-            // Phong cách 3: Viết chữ số lẻ ở đuôi
-            `${s1}.${s2}.${s3.substring(0,2)}` + numToVietnameseText[s3.substring(2)],
-            // Phong cách 4: Trộn chữ số lẫn lộn nhưng cực kỳ trực quan
-            `${s1}..${s2}..${s3.substring(0,1)}` + numToVietnameseText[s3.substring(1,2)] + numToVietnameseText[s3.substring(2)],
-            // Phong cách 5: Ngăn cách bằng chữ cái vô nghĩa
+            `${s1}.${s2}.${s3.substring(0,2)}` + (numToVietnameseText[s3.substring(2)] || ''),
+            `${s1}..${s2}..${s3.substring(0,1)}` + (numToVietnameseText[s3.substring(1,2)] || '') + (numToVietnameseText[s3.substring(2)] || ''),
             `LH ${h1}a${h2}b${h3}`,
-            // Phong cách 6: Phong cách đứt nét dấu gạch ngang
             `alo_${s1}_${s2}_${s3}`
         ];
 
@@ -283,52 +276,43 @@
         return result;
     }
 
-    // THUẬT TOÁN ĐẢO CHIỀU NGẪU NHIÊN ĐỊA CHỈ THEO YÊU CẦU MỚI
     function reverseAndTweakAddress(srcAddr) {
         let addr = (srcAddr || '').trim();
         if (!addr) return '';
 
-        // Tách theo phân cấp hành chính (dấu phẩy)
         let parts = addr.split(',').map(p => p.trim()).filter(p => p.length > 0);
         if (parts.length === 0) return '';
 
-        let streetPart = parts[0]; // Thông thường là phần số nhà + tên đường
+        let streetPart = parts[0]; 
         let houseNum = '';
         let streetName = streetPart;
 
-        // Nhận dạng số nhà (ví dụ: "33/11", "33", "12A")
         let numRegex = /^(\d+[\w]*\/\d+[\w]*|\d+[A-Za-z]?)\s+(.+)$/i;
         if (numRegex.test(streetPart)) {
             let match = streetPart.match(numRegex);
-            houseNum = match[1]; // "33/11"
-            streetName = match[2]; // "Cống Trải"
+            houseNum = match[1]; 
+            streetName = match[2]; 
         }
 
-        let adminParts = parts.slice(1); // Phường, Quận, Tỉnh...
-        let reversedAdminParts = [...adminParts].reverse(); // Đảo ngược thứ tự hành chính
+        let adminParts = parts.slice(1); 
+        let reversedAdminParts = [...adminParts].reverse(); 
         let variants = [];
 
-        // Biến thể 1: 33/11 cống trải, hậu giang, vị thanh (Giữ nguyên số nhà+đường, đảo ngược phần hành chính)
         variants.push([streetPart, ...reversedAdminParts].join(', '));
 
         if (houseNum) {
-            // Biến thể 2: cống trải, hậu giang, vị thanh, 33/11 (Tên đường lên đầu, số nhà đẩy xuống cuối)
             variants.push([streetName, ...reversedAdminParts, houseNum].join(', '));
-
-            // Biến thể 3: cống trải, 33/11, hậu giang, vị thanh (Tách riêng số nhà chèn giữa)
             variants.push([streetName, houseNum, ...reversedAdminParts].join(', '));
 
-            // Biến thể 4: trải, hậu giang, vị thanh, (33/11) (Lấy chữ cuối của tên đường, số nhà bỏ ngoặc cuối câu)
-            let streetWords = streetName.split(' ');
+            // FIX 3: Lọc khoảng trắng thừa để không tạo ra phần tử rỗng trong mảng
+            let streetWords = streetName.split(' ').filter(w => w.length > 0);
             if (streetWords.length > 1) {
-                let lastWord = streetWords.pop(); // Lấy chữ "trải", bỏ chữ "cống"
+                let lastWord = streetWords.pop(); 
                 variants.push([lastWord, ...reversedAdminParts, `(${houseNum})`].join(', '));
             } else {
-                // Nếu tên đường chỉ có 1 chữ
                 variants.push([streetName, ...reversedAdminParts, `(${houseNum})`].join(', '));
             }
         } else {
-            // Nếu không nhận diện được số nhà, chỉ đảo ngược các phần đơn thuần
             let roll = Math.random();
             if (roll < 0.5 && parts.length > 1) {
                 variants.push([...adminParts, streetPart].join(', ')); 
@@ -337,10 +321,8 @@
             }
         }
 
-        // Chọn ngẫu nhiên 1 trong các biến thể trên
         let finalAddr = getRandom(variants);
 
-        // Áp dụng chèn khoảng trắng tàng hình Shopee Bypass nếu được bật
         if (document.getElementById("opt_shopee_bypass").checked) {
             finalAddr = insertInvisibleBypass(finalAddr);
         }
@@ -358,8 +340,6 @@
         let midName = words.slice(1, words.length - 1).join(' ');
 
         let s1 = cleanParts.s1;
-        let s2 = cleanParts.s2;
-        let s3 = cleanParts.s3;
         let pFull = cleanParts.full;
 
         let doubleFirstChar = firstName + firstName[firstName.length - 1].repeat(getRandom([1, 2]));
@@ -478,7 +458,6 @@
             return;
         }
 
-        // Tách số điện thoại để xử lý
         let cleanParts = {
             full: phoneInput.replace(/\D/g, ''),
             s1: phoneInput.replace(/\D/g, '').slice(0, 4),
@@ -486,31 +465,26 @@
             s3: phoneInput.replace(/\D/g, '').slice(7)
         };
 
-        // 1. Xử lý tên người nhận
         let tweakedName = "";
         if (nameInput) {
             tweakedName = isNameChecked ? generateTweakedName(nameInput, cleanParts) : nameInput;
         }
         document.getElementById("res_tweaked_name").value = tweakedName;
 
-        // 2. Xử lý ghi chú số điện thoại Bypass
         let finalPhoneNote = generateSuperBypassPhone(phoneInput);
         if (isBypassChecked) {
             finalPhoneNote = buildFullNoteStructure(finalPhoneNote);
         }
         document.getElementById("res_phone_note").value = finalPhoneNote;
 
-        // 3. Xử lý Địa chỉ đảo chiều tự nhiên
         let processedAddress = reverseAndTweakAddress(addrInput);
         let hasAddress = processedAddress.length > 0;
 
         let finalFullAddress = "";
         if (hasAddress) {
-            // Lồng thêm tên cửa hàng giả lập ngẫu nhiên ở đầu để tăng độ uy tín tránh AI nghi ngờ đơn rác
             let prefixBrandStr = `(${getRandom(brands)} ${getRandom(names)}) `;
             finalFullAddress = `${prefixBrandStr}${processedAddress} ${finalPhoneNote}`.trim();
         } else {
-            // Nếu không nhập địa chỉ gốc, xuất thẳng Note SĐT ra làm địa chỉ hệ thống luôn
             finalFullAddress = finalPhoneNote;
         }
 
@@ -520,12 +494,14 @@
         showToast("Xử lý bypass thành công!");
     }
 
+    // FIX 4: Bổ sung focus() để đảm bảo select() hoạt động trên mọi trình duyệt Mobile
     function copyText(id) {
         let el = document.getElementById(id);
         if (!el.value) {
             showToast("Không có nội dung để sao chép!");
             return;
         }
+        el.focus();
         el.select();
         el.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(el.value).then(() => {
