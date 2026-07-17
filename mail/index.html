@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mail Generator</title>
+    <style>
+        :root {
+            --bg-color: #121212;       /* Đen nền chính */
+            --card-bg: #1e1e1e;        /* Đen nhẹ cho khung */
+            --primary-color: #ff6600;   /* Cam chủ đạo */
+            --primary-hover: #e05500;   /* Cam đậm khi hover */
+            --text-main: #ffffff;       /* Trắng cho chữ chính */
+            --text-sub: #a0a0a0;        /* Xám cho chữ phụ */
+            --input-bg: #2a2a2a;        /* Đen xám cho ô nhập */
+            --border-color: #3d3d3d;    /* Viền */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 480px;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--text-main);
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 span {
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-sub);
+            font-size: 14px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-copy:hover {
+            background-color: var(--primary-color);
+            color: var(--text-main);
+        }
+
+        .btn-generate {
+            background-color: var(--primary-color);
+            color: var(--text-main);
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-generate:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-generate:active {
+            transform: translateY(1px);
+        }
+
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--primary-color);
+            color: var(--text-main);
+            text-align: center;
+            border-radius: 6px;
+            padding: 12px;
+            position: fixed;
+            z-index: 10;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Mail Generator Info</span></h2>
+    
+    <div class="form-group">
+        <label>Họ và Tên:</label>
+        <div class="input-group">
+            <input type="text" id="fullName" readonly>
+            <button class="btn-copy" onclick="copyText('fullName')">Sao chép</button>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Ngày sinh (18 - 40 tuổi):</label>
+        <div class="input-group">
+            <input type="text" id="birthDate" readonly>
+            <button class="btn-copy" onclick="copyText('birthDate')">Sao chép</button>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Giới tính:</label>
+        <div class="input-group">
+            <input type="text" id="gender" readonly>
+            <button class="btn-copy" onclick="copyText('gender')">Sao chép</button>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Gợi ý định dạng Gmail:</label>
+        <div class="input-group">
+            <input type="text" id="email" readonly>
+            <button class="btn-copy" onclick="copyText('email')">Sao chép</button>
+        </div>
+    </div>
+
+    <button class="btn-generate" onclick="generateData()">Random Create Info</button>
+</div>
+
+<div id="toast" class="toast">ĐÃ SAO CHÉP THÀNH CÔNG!</div>
+
+<script>
+const hoList = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Phan', 'Vũ', 'Võ', 'Đặng', 'Bùi', 'Đỗ', 'Hồ', 'Ngô', 'Dương', 'Lý'];
+const demNam = ['Văn', 'Đức', 'Minh', 'Tuấn', 'Thành', 'Quang', 'Anh', 'Hải', 'Duy', 'Mạnh'];
+const tenNam = ['Anh', 'Tuấn', 'Minh', 'Hùng', 'Cường', 'Dũng', 'Hoàng', 'Hải', 'Phong', 'Sơn', 'Đạt', 'Lâm', 'Phúc'];
+const demNu = ['Thị', 'Ngọc', 'Minh', 'Thu', 'Phương', 'Khánh', 'Tuyết', 'Hồng', 'Thanh', 'Diệu'];
+const tenNu = ['Anh', 'Hoa', 'Linh', 'Nhi', 'Trang', 'Phương', 'Hương', 'Thảo', 'Mai', 'Duyên', 'Yến', 'Quỳnh'];
+
+const removeSign = (str) => {
+    return str.toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/[^a-z0-9]/g, '');
+};
+
+function generateData() {
+    const isNam = Math.random() > 0.5;
+    const gioiTinh = isNam ? 'Nam' : 'Nữ';
+    
+    const ho = hoList[Math.floor(Math.random() * hoList.length)];
+    const dem = isNam ? demNam[Math.floor(Math.random() * demNam.length)] : demNu[Math.floor(Math.random() * demNu.length)];
+    const ten = isNam ? tenNam[Math.floor(Math.random() * tenNam.length)] : tenNu[Math.floor(Math.random() * tenNu.length)];
+    const hoVaTen = `${ho} ${dem} ${ten}`;
+
+    const currentYear = new Date().getFullYear();
+    const birthYear = currentYear - Math.floor(Math.random() * (40 - 18 + 1)) - 18;
+    const birthMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+    const birthDay = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+    const ngaySinh = `${birthDay}/${birthMonth}/${birthYear}`;
+
+    const targetHo = removeSign(ho);
+    const targetDem = removeSign(dem);
+    const targetTen = removeSign(ten);
+    
+    const emailStyles = [
+        `${targetTen}.${targetHo}${targetDem}${birthYear}`,
+        `${targetHo}${targetDem}${targetTen}${birthDay}${birthMonth}`,
+        `${targetTen}${targetHo}${birthYear % 100}`,
+        `${targetHo}.${targetDem}.${targetTen}.${Math.floor(Math.random() * 899 + 100)}`
+    ];
+    const emailGoiY = emailStyles[Math.floor(Math.random() * emailStyles.length)] + '@gmail.com';
+
+    document.getElementById('fullName').value = hoVaTen;
+    document.getElementById('birthDate').value = ngaySinh;
+    document.getElementById('gender').value = gioiTinh;
+    document.getElementById('email').value = emailGoiY;
+}
+
+function copyText(elementId) {
+    const inputElement = document.getElementById(elementId);
+    if (!inputElement.value) return;
+    
+    inputElement.select();
+    inputElement.setSelectionRange(0, 99999);
+    
+    navigator.clipboard.writeText(inputElement.value).then(() => {
+        const toast = document.getElementById('toast');
+        toast.className = 'toast show';
+        setTimeout(() => { toast.className = 'toast'; }, 2000);
+    });
+}
+
+window.onload = generateData;
+</script>
+
+</body>
+</html>
