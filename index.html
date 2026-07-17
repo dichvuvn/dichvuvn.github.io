@@ -531,6 +531,12 @@
                     <p>Tạo thông tin người dùng Shopee ngẫu nhiên.</p>
                     <a href="/shoppe" class="btn-intro">Truy cập →</a>
                 </div>
+                <div class="intro-card">
+                    <div class="icon">📧</div>
+                    <h3>Gmail Info Generator</h3>
+                    <p>Tạo thông tin tài khoản Gmail ngẫu nhiên (Email, Mật khẩu).</p>
+                    <a href="/mail" class="btn-intro">Truy cập →</a>
+                </div>
             </div>
         </div>
 
@@ -610,6 +616,44 @@
             </div>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- ===== TOOL 3: GMAIL INFO GENERATOR ===== -->
+        <!-- ============================================================ -->
+        <div id="page-mail" class="tool-panel">
+            <a href="/" class="back-link">← Quay lại trang chủ</a>
+            <div class="tool-title">
+                <span class="icon">📧</span>
+                Gmail Info Generator
+            </div>
+            <div class="tool-desc">
+                Tạo thông tin tài khoản Gmail ngẫu nhiên bao gồm: Địa chỉ Email, Mật khẩu bảo mật và SĐT khôi phục (ảo).
+            </div>
+
+            <div class="gen-area">
+                <div class="label">
+                    <span>📧 Thông tin Gmail</span>
+                    <span class="count" id="mail-count">#0</span>
+                </div>
+                <div class="output" id="mail-output">
+                    <span class="muted">Nhấn "Tạo thông tin" để bắt đầu</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btn-gen-mail">🎲 Tạo thông tin</button>
+                <button class="btn btn-success" id="btn-copy-mail">📋 Sao chép</button>
+                <button class="btn btn-secondary" id="btn-mail-more">➕ Tạo thêm</button>
+            </div>
+
+            <div class="history-area">
+                <div class="h-title">
+                    <span>📜 Lịch sử</span>
+                    <button class="clear-btn" id="clear-mail-history">Xóa tất cả</button>
+                </div>
+                <div class="history-list" id="mail-history"></div>
+            </div>
+        </div>
+
     </div>
 
     <!-- ===== TOAST ===== -->
@@ -623,6 +667,7 @@
         const pageIntro = document.getElementById('page-intro');
         const pageAdrr  = document.getElementById('page-adrr');
         const pageShoppe= document.getElementById('page-shoppe');
+        const pageMail  = document.getElementById('page-mail');
 
         const path = window.location.pathname;
 
@@ -630,6 +675,7 @@
         pageIntro.style.display = 'none';
         pageAdrr.classList.remove('active');
         pageShoppe.classList.remove('active');
+        pageMail.classList.remove('active');
 
         if (path === '/adrr') {
             pageAdrr.classList.add('active');
@@ -637,6 +683,9 @@
         } else if (path === '/shoppe') {
             pageShoppe.classList.add('active');
             pageShoppe.style.display = 'block';
+        } else if (path === '/mail') {
+            pageMail.classList.add('active');
+            pageMail.style.display = 'block';
         } else {
             // mặc định: trang giới thiệu
             pageIntro.style.display = 'block';
@@ -702,6 +751,11 @@
             'Set kem dưỡng da', 'Balo du lịch', 'Áo khoác gió', 'Váy công sở', 'Quần tây nam',
             'Kính râm', 'Sạc dự phòng', 'Bàn phím cơ', 'Chuột không dây', 'Nồi chiên không dầu'
         ];
+
+        // Dữ liệu cho Gmail Generator
+        const FIRST_NAMES = ['nguyen', 'tran', 'le', 'pham', 'hoang', 'vu', 'dang', 'bui', 'do', 'ho'];
+        const MIDDLE_NAMES = ['van', 'thi', 'minh', 'hoang', 'thanh', 'quang', 'duc', 'thu', 'ngoc', 'thuy'];
+        const LAST_NAMES = ['an', 'binh', 'cuong', 'dung', 'ha', 'huong', 'khanh', 'lan', 'manh', 'nam', 'phuc', 'quyen', 'sang', 'tam', 'thanh', 'trang', 'trung', 'tuyen'];
 
         function randomItem(arr) {
             return arr[Math.floor(Math.random() * arr.length)];
@@ -880,6 +934,109 @@
         });
 
         // ================================================================
+        //  GMAIL GENERATOR
+        // ================================================================
+
+        let mailHistory = [];
+        let mailCount = 0;
+
+        function generatePassword(length = 12) {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+            let pass = '';
+            for (let i = 0; i < length; i++) {
+                pass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return pass;
+        }
+
+        function generateMail() {
+            const first = randomItem(FIRST_NAMES);
+            const middle = randomItem(MIDDLE_NAMES);
+            const last = randomItem(LAST_NAMES);
+            const num = randomInt(100, 99999);
+            
+            const formats = [
+                `${first}${last}${num}`,
+                `${first}.${last}${num}`,
+                `${first}${middle}${last}`,
+                `${first}${middle}.${last}`,
+                `${last}${first}${num}`,
+                `${first}_${last}${num}`
+            ];
+
+            const email = randomItem(formats) + '@gmail.com';
+            const password = generatePassword();
+            const recoveryPhone = `+840${randomInt(3,9)}${randomInt(10000000, 99999999)}`;
+
+            return { email, password, recoveryPhone };
+        }
+
+        function renderMail(data) {
+            return `
+                📧 ${data.email}
+                <span class="sub">🔑 Mật khẩu: ${data.password}</span>
+                <span class="sub">📱 SĐT khôi phục: ${data.recoveryPhone}</span>
+            `;
+        }
+
+        function addMailToHistory(item) {
+            mailHistory.unshift(item);
+            if (mailHistory.length > 20) mailHistory.pop();
+            renderMailHistory();
+            mailCount++;
+            document.getElementById('mail-count').textContent = '#' + mailCount;
+        }
+
+        function renderMailHistory() {
+            const container = document.getElementById('mail-history');
+            container.innerHTML = mailHistory.map((item, idx) => `
+                <div class="history-item">
+                    <span class="h-text">${item.email} - ${item.password}</span>
+                    <span class="h-time">#${mailHistory.length - idx}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateMailOutput(data) {
+            document.getElementById('mail-output').innerHTML = renderMail(data);
+        }
+
+        // Sự kiện
+        document.getElementById('btn-gen-mail').addEventListener('click', function() {
+            const data = generateMail();
+            addMailToHistory(data);
+            updateMailOutput(data);
+        });
+
+        document.getElementById('btn-mail-more').addEventListener('click', function() {
+            for (let i = 0; i < 5; i++) {
+                const data = generateMail();
+                addMailToHistory(data);
+                if (i === 4) updateMailOutput(data);
+            }
+        });
+
+        document.getElementById('btn-copy-mail').addEventListener('click', function() {
+            const output = document.getElementById('mail-output').innerText;
+            if (output && !output.includes('Nhấn "Tạo thông tin"')) {
+                navigator.clipboard.writeText(output).then(() => {
+                    showToast('✅ Đã sao chép thông tin Gmail!');
+                }).catch(() => {
+                    showToast('❌ Không thể sao chép');
+                });
+            } else {
+                showToast('⚠️ Hãy tạo thông tin trước');
+            }
+        });
+
+        document.getElementById('clear-mail-history').addEventListener('click', function() {
+            mailHistory = [];
+            renderMailHistory();
+            document.getElementById('mail-output').innerHTML = `<span class="muted">Đã xóa lịch sử</span>`;
+            showToast('🗑️ Đã xóa lịch sử');
+        });
+
+        // ================================================================
         //  TOAST UTILITY
         // ================================================================
 
@@ -911,6 +1068,13 @@
             const sample = generateShopee();
             addShopeeToHistory(sample);
             updateShopeeOutput(sample);
+        }
+
+        // Nếu đang ở trang Mail, tạo sẵn 1 thông tin
+        if (path === '/mail') {
+            const sample = generateMail();
+            addMailToHistory(sample);
+            updateMailOutput(sample);
         }
     </script>
 </body>
