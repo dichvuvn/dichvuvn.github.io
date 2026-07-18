@@ -230,6 +230,28 @@
 `(Shipper LH: ${tweakedPhone})`,
 `(Số liên hệ: ${tweakedPhone})`,
 `(Phone nhận: ${tweakedPhone})`,
+`[sdtnhanhangne ${tweakedPhone}]`,
+`[dienthoainhanhang ${tweakedPhone}]`,
+`[songuoilienhe ${tweakedPhone}]`,
+`[phonenhanhang ${tweakedPhone}]`,
+`[callmenhanhang ${tweakedPhone}]`,
+`[shipgoisonay ${tweakedPhone}]`,
+`[alonhanhang ${tweakedPhone}]`,
+`[S-Đ-T_Nhận: ${tweakedPhone}]`,
+`[S.D.T-Nhan: ${tweakedPhone}]`,
+`[Đ_T_N_H_A_N: ${tweakedPhone}]`,
+`[L-H-N-H-A-N: ${tweakedPhone}]`,
+`(Sđt*Nhận*Hàng: ${tweakedPhone})`,
+`(Alo/Nhận/Hàng: ${tweakedPhone})`,
+`[H.o.t.l.i.n.e.Nhận: ${tweakedPhone}]`,
+`[C.a.l.l.M.e: ${tweakedPhone}]`,
+`[SdtNhanHangGoiShop:${tweakedPhone}]`,
+`[LienHeNhanHangNgay:${tweakedPhone}]`,
+`[AloNguoiNhanHg:${tweakedPhone}]`,
+`[DienThoaiNhanDon:${tweakedPhone}]`,
+`[ShipperGoiSoNayNha:${tweakedPhone}]`,
+`[SoChinhChuNhanHang:${tweakedPhone}]`,
+
         ];
         return getRandom(templates);
     }
