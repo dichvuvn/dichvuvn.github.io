@@ -136,7 +136,7 @@
             `${firstName} (${s1.substring(1)}...)`,
             `${firstName} (${pFull})`,
             `Anh ${firstName} (${s1})`,
-            `Chị ${firstName} ${suffix}`,
+            `Người Nhận ${firstName} ${suffix}`,
             `${suffix} ${firstName}`,
             `${firstName} ${getRandom(shopSuffixes)} ${Math.floor(Math.random() * 90 + 10)}` // Ex: Quang Shop 45
         ];
