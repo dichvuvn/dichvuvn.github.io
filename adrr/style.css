@@ -1,0 +1,140 @@
+        :root {
+            --primary-color: #ee4d2d;
+            --bg-color: #f4f6f9;
+            --text-color: #333;
+            --border-radius: 8px;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 10px;
+            color: var(--text-color);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+        .form-group { margin-bottom: 15px; }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #555;
+            font-size: 14px;
+        }
+        .input-group { display: flex; }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            box-sizing: border-box;
+            background: #fff;
+        }
+        input.input-source {
+            background: #fffdeb;
+            border: 1px solid #e0d090;
+        }
+        input[readonly] {
+            background: #f9f9f9;
+            cursor: default;
+        }
+        input.has-btn {
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+        }
+        button.btn-copy {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-left: none;
+            padding: 0 16px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        button.btn-copy:active { background: #e0e0e0; }
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 10px;
+            background: #fff9f8;
+            border: 1px dashed #ffc5ba;
+            border-radius: var(--border-radius);
+            flex-wrap: wrap;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            font-weight: bold;
+            color: #e65100;
+            cursor: pointer;
+        }
+        .checkbox-label input {
+            margin-right: 6px;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+        }
+        button.btn-main {
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(238, 77, 45, 0.2);
+        }
+        button.btn-main:active { background: #d73c1f; }
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .section-title {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 20px 0 10px 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 4px;
+        }
+        .hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        .result-block {
+            transition: opacity .2s;
+        }
