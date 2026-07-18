@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Variant Generator</title>
+    <title>Variant Generator Pro</title>
     <style>
         :root {
             --primary-color: #ee4d2d;
@@ -218,7 +218,8 @@
 
 <script>
     const brands = ["Tạp Hóa", "Shop", "Cửa Hàng", "Đại Lý", "Salon", "Quán Ăn", "Tiệm Điện Thoại", "Điện Máy", "Tiệm Bánh", "Cửa Tiệm", "MiniMart"];
-    const names = ["Lan", "Hùng", "Mai", "Tuấn", "Thanh", "Vinh", "Mỹ", "Phượng", "Đức", "Khánh", "An", "Thịnh", "Vy", "Hà", "Linh"];
+    const namesDict = ["Lan", "Hùng", "Mai", "Tuấn", "Thanh", "Vinh", "Mỹ", "Phượng", "Đức", "Khánh", "An", "Thịnh", "Vy", "Hà", "Linh"];
+    const shopSuffixes = ["Shop", "Online Shop", "Store", "Official", "Express", "ExpressVN", "Delivery", "Market", "Trading", "Center", "Plus", "Pro", "Max", "Mini", "Home", "Family", "House", "Group", "Team", "Club", "VIP", "9x", "8x", "GenZ", "One", "New", "Best", "Fast", "Smart", "Star", "City", "VN", "SG", "HN", "Local", "PlusVN"];
 
     function getRandom(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
@@ -232,7 +233,6 @@
         t._timer = setTimeout(() => { t.style.display = "none"; }, 1500);
     }
 
-    // FIX 1: Dùng Array.from(str) thay vì str.split('') để không bị đứt chữ tiếng Việt có dấu
     function insertInvisibleBypass(str) {
         if (!str) return '';
         const invisibleChars = ['\u200C', '\u200D', '\u2060'];
@@ -254,25 +254,25 @@
         let s2 = clean.slice(4, 7);
         let s3 = clean.slice(7);
 
-        let homoglyphZero = clean.replace(/^0/, getRandom(['o', 'O', '⓪']));
+        // Đổi số 0 đầu tiên thành chữ 'o' hoặc 'O' (Homoglyph) hoặc giữ nguyên
+        let homoglyphZero = clean.replace(/^0/, getRandom(['o', 'O', '0']));
         let h1 = homoglyphZero.slice(0, 4);
         let h2 = homoglyphZero.slice(4, 7);
         let h3 = homoglyphZero.slice(7);
 
-        // FIX 2: Thêm fallback || '' để chống lỗi in ra chữ "undefined" nếu s3 không đủ độ dài
         let styles = [
-            `Không_${s1.substring(1)}.${s2}.${s3}`,
-            `o${clean.substring(1,4)}_${s2}_${s3}`,
-            `${s1}.${s2}.${s3.substring(0,2)}` + (numToVietnameseText[s3.substring(2)] || ''),
-            `${s1}..${s2}..${s3.substring(0,1)}` + (numToVietnameseText[s3.substring(1,2)] || '') + (numToVietnameseText[s3.substring(2)] || ''),
-            `LH ${h1}a${h2}b${h3}`,
-            `alo_${s1}_${s2}_${s3}`
+            `${s1}.${s2}.${s3}`,
+            `${h1}.${h2}.${h3}`,
+            `o${clean.substring(1,4)} ${s2} ${s3}`,
+            `${s1} ${s2} ${s3.substring(0,2)}` + (numToVietnameseText[s3.substring(2)] || ''),
+            `${s1}_${s2}_${s3}`,
+            `${h1} ${h2} ${h3}`,
+            `0${clean.substring(1,4)}.${s2}.${s3}`,
+            `${s1} ${s2}.${s3}`,
+            `${h1} ${s2} ${h3.substring(0,2)}` + (numToVietnameseText[s3.substring(2)] || '')
         ];
 
         let result = getRandom(styles);
-        if (document.getElementById("opt_shopee_bypass").checked) {
-            result = insertInvisibleBypass(result);
-        }
         return result;
     }
 
@@ -304,7 +304,6 @@
             variants.push([streetName, ...reversedAdminParts, houseNum].join(', '));
             variants.push([streetName, houseNum, ...reversedAdminParts].join(', '));
 
-            // FIX 3: Lọc khoảng trắng thừa để không tạo ra phần tử rỗng trong mảng
             let streetWords = streetName.split(' ').filter(w => w.length > 0);
             if (streetWords.length > 1) {
                 let lastWord = streetWords.pop(); 
@@ -342,14 +341,23 @@
         let s1 = cleanParts.s1;
         let pFull = cleanParts.full;
 
-        let doubleFirstChar = firstName + firstName[firstName.length - 1].repeat(getRandom([1, 2]));
+        // Tạo biến thể tên đệm ngẫu nhiên, không bị lặp code cũ
+        let suffix = getRandom(shopSuffixes);
+        
+        // Chỉ lặp lại ký tự cuối 1 lần, xác suất 50/50 để tránh trùng lặp "Quangg" quá nhiều
+        let doubleFirstChar = Math.random() > 0.5 ? firstName + firstName[firstName.length - 1] : firstName;
         
         let nameVariants = [
-            `${firstName} ${getRandom(['Shop', 'Store', 'Official', 'Express', 'ExpressVN', 'Delivery', 'Market', 'Trading', 'Center', 'Plus', 'Pro', 'Max', 'Mini', 'Home', 'Family', 'House', 'Group', 'Team', 'Club', 'Member', 'VIP', '9x', '8x', 'GenZ', '2024', '2025', '2026', '01', '02', '03', '86', '88', '99', 'One', 'New', 'Best', 'Fast', 'Good', 'Smart', 'Blue', 'Green', 'Red', 'Gold', 'Silver', 'Star', 'Moon', 'Sun', 'Sky', 'City', 'VN', 'SG', 'HN', 'CT', 'Local', 'PlusVN'])}`,
+            `${firstName} ${suffix}`,
+            `${firstName} ${lastName} ${suffix}`,
             `${lastName} ${doubleFirstChar}`,
             `${doubleFirstChar} ${midName ? midName : ''}`.trim(),
             `${firstName} (${s1.substring(1)}...)`,
-            `Anh ${firstName} (${s1})`
+            `${firstName} (${pFull})`,
+            `Anh ${firstName} (${s1})`,
+            `Chị ${firstName} ${suffix}`,
+            `${suffix} ${firstName}`,
+            `${firstName} ${getRandom(shopSuffixes)} ${Math.floor(Math.random() * 90 + 10)}` // Ex: Quang Shop 45
         ];
 
         let result = getRandom(nameVariants);
@@ -361,7 +369,7 @@
 
     function buildFullNoteStructure(tweakedPhone) {
         let templates = [
-`[Gọj ngay ${tweakedPhone}]`,
+`[Gọi ngay ${tweakedPhone}]`,
 `[Alô ${tweakedPhone}]`,
 `(L.Hệ giao hàng: ${tweakedPhone})`,
 `[Call me: ${tweakedPhone}]`,
@@ -398,7 +406,7 @@
 `(Alo khi tới: ${tweakedPhone})`,
 `[Vui lòng gọi ${tweakedPhone}]`,
 `[Liên hệ trực tiếp ${tweakedPhone}]`,
-`[Giao sdt${tweakedPhone} nha ship]`,
+`[Giao sdt ${tweakedPhone} nha ship]`,
 `[sdtnhanhang ${tweakedPhone}]`,
 `[sdtcuadonhang ${tweakedPhone}]`,
 `[SĐT nhận hàng ${tweakedPhone}]`,
@@ -482,7 +490,7 @@
 
         let finalFullAddress = "";
         if (hasAddress) {
-            let prefixBrandStr = `(${getRandom(brands)} ${getRandom(names)}) `;
+            let prefixBrandStr = `(${getRandom(brands)} ${getRandom(namesDict)}) `;
             finalFullAddress = `${prefixBrandStr}${processedAddress} ${finalPhoneNote}`.trim();
         } else {
             finalFullAddress = finalPhoneNote;
@@ -491,10 +499,9 @@
         document.getElementById("res_full_address").value = finalFullAddress;
         document.getElementById("addr_hint").style.display = hasAddress ? "none" : "block";
 
-        showToast("Xử lý bypass thành công!");
+        showToast("Đã sinh biến thể thành công!");
     }
 
-    // FIX 4: Bổ sung focus() để đảm bảo select() hoạt động trên mọi trình duyệt Mobile
     function copyText(id) {
         let el = document.getElementById(id);
         if (!el.value) {
