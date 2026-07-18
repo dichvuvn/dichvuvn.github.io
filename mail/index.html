@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mail Generator</title>
+    <title>Mail Generator Pro</title>
     <style>
         :root {
-            --bg-color: #121212;       /* Đen nền chính */
-            --card-bg: #1e1e1e;        /* Đen nhẹ cho khung */
-            --primary-color: #ff6600;   /* Cam chủ đạo */
-            --primary-hover: #e05500;   /* Cam đậm khi hover */
-            --text-main: #ffffff;       /* Trắng cho chữ chính */
-            --text-sub: #a0a0a0;        /* Xám cho chữ phụ */
-            --input-bg: #2a2a2a;        /* Đen xám cho ô nhập */
-            --border-color: #3d3d3d;    /* Viền */
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --primary-color: #ff6600;
+            --primary-hover: #e05500;
+            --text-main: #ffffff;
+            --text-sub: #a0a0a0;
+            --input-bg: #2a2a2a;
+            --border-color: #3d3d3d;
         }
 
         body {
@@ -156,7 +156,8 @@
 <body>
 
 <div class="container">
-    <h2>Mail Generator Info</span></h2>
+    <!-- Đã sửa lỗi thẻ span dư thừa ở tiêu đề cũ -->
+    <h2>Mail <span>Generator Info</span></h2>
     
     <div class="form-group">
         <label>Họ và Tên:</label>
@@ -196,11 +197,12 @@
 <div id="toast" class="toast">ĐÃ SAO CHÉP THÀNH CÔNG!</div>
 
 <script>
-const hoList = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Phan', 'Vũ', 'Võ', 'Đặng', 'Bùi', 'Đỗ', 'Hồ', 'Ngô', 'Dương', 'Lý'];
-const demNam = ['Văn', 'Đức', 'Minh', 'Tuấn', 'Thành', 'Quang', 'Anh', 'Hải', 'Duy', 'Mạnh'];
-const tenNam = ['Anh', 'Tuấn', 'Minh', 'Hùng', 'Cường', 'Dũng', 'Hoàng', 'Hải', 'Phong', 'Sơn', 'Đạt', 'Lâm', 'Phúc'];
-const demNu = ['Thị', 'Ngọc', 'Minh', 'Thu', 'Phương', 'Khánh', 'Tuyết', 'Hồng', 'Thanh', 'Diệu'];
-const tenNu = ['Anh', 'Hoa', 'Linh', 'Nhi', 'Trang', 'Phương', 'Hương', 'Thảo', 'Mai', 'Duyên', 'Yến', 'Quỳnh'];
+// 1. Mở rộng danh sách tên để giảm trùng lặp cơ bản
+const hoList = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Phan', 'Vũ', 'Võ', 'Đặng', 'Bùi', 'Đỗ', 'Hồ', 'Ngô', 'Dương', 'Lý', 'Trịnh', 'Đào', 'Đoàn', 'Lâm', 'Lương'];
+const demNam = ['Văn', 'Đức', 'Minh', 'Tuấn', 'Thành', 'Quang', 'Anh', 'Hải', 'Duy', 'Mạnh', 'Quang', 'Bảo', 'Đình', 'Hữu', 'Tất'];
+const tenNam = ['Anh', 'Tuấn', 'Minh', 'Hùng', 'Cường', 'Dũng', 'Hoàng', 'Hải', 'Phong', 'Sơn', 'Đạt', 'Lâm', 'Phúc', 'Khang', 'Long', 'Thiện', 'Nhân', 'Quân', 'Bách', 'Khoa'];
+const demNu = ['Thị', 'Ngọc', 'Minh', 'Thu', 'Phương', 'Khánh', 'Tuyết', 'Hồng', 'Thanh', 'Diệu', 'Đan', 'Mai', 'Yến', 'Thủy', 'Bích'];
+const tenNu = ['Anh', 'Hoa', 'Linh', 'Nhi', 'Trang', 'Phương', 'Hương', 'Thảo', 'Mai', 'Duyên', 'Yến', 'Quỳnh', 'Châu', 'Giang', 'Hà', 'Hân', 'Ngân', 'Như', 'Tiên', 'Vy'];
 
 const removeSign = (str) => {
     return str.toLowerCase()
@@ -210,13 +212,31 @@ const removeSign = (str) => {
         .replace(/[^a-z0-9]/g, '');
 };
 
+// Hàm lấy ngẫu nhiên 1 phần tử trong mảng
+const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+// 2. Hàm tạo chuỗi ký tự ngẫu nhiên (Anti-Trùng lặp)
+function generateRandomString(length) {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
+
+// Hàm lấy số ngẫu nhiên lớn (1000 - 9999)
+function getRandomBigNumber() {
+    return Math.floor(Math.random() * 9000) + 1000;
+}
+
 function generateData() {
     const isNam = Math.random() > 0.5;
     const gioiTinh = isNam ? 'Nam' : 'Nữ';
     
-    const ho = hoList[Math.floor(Math.random() * hoList.length)];
-    const dem = isNam ? demNam[Math.floor(Math.random() * demNam.length)] : demNu[Math.floor(Math.random() * demNu.length)];
-    const ten = isNam ? tenNam[Math.floor(Math.random() * tenNam.length)] : tenNu[Math.floor(Math.random() * tenNu.length)];
+    const ho = getRandom(hoList);
+    const dem = isNam ? getRandom(demNam) : getRandom(demNu);
+    const ten = isNam ? getRandom(tenNam) : getRandom(tenNu);
     const hoVaTen = `${ho} ${dem} ${ten}`;
 
     const currentYear = new Date().getFullYear();
@@ -229,13 +249,19 @@ function generateData() {
     const targetDem = removeSign(dem);
     const targetTen = removeSign(ten);
     
-    const emailStyles = [
-        `${targetTen}.${targetHo}${targetDem}${birthYear}`,
-        `${targetHo}${targetDem}${targetTen}${birthDay}${birthMonth}`,
-        `${targetTen}${targetHo}${birthYear % 100}`,
-        `${targetHo}.${targetDem}.${targetTen}.${Math.floor(Math.random() * 899 + 100)}`
+    // 3. Các định dạng email phức tạp, kết hợp nhiều yếu tố ngẫu nhiên
+    const styles = [
+        `${targetTen}${targetHo}${getRandomBigNumber()}`,                          // tenho1234
+        `${targetHo}.${targetTen}${getRandomBigNumber()}`,                         // ho.ten1234
+        `${targetTen}${targetHo}${birthYear}${generateRandomString(3)}`,           // tenho1999a1b
+        `${targetHo}${targetDem}${targetTen}${getRandomBigNumber()}`,              // hodemten1234
+        `${targetTen}.${targetHo}.${generateRandomString(5)}`,                     // ten.ho.abc12
+        `${targetHo}${targetTen}_${birthYear % 100}${getRandomBigNumber()}`,       // hoten_991234
+        `${generateRandomString(1)}${targetTen}${targetHo}${getRandomBigNumber()}`,// xtenho5678
+        `${targetHo}${targetTen}.${birthMonth}${birthDay}`                         // hoten.0512
     ];
-    const emailGoiY = emailStyles[Math.floor(Math.random() * emailStyles.length)] + '@gmail.com';
+    
+    const emailGoiY = getRandom(styles) + '@gmail.com';
 
     document.getElementById('fullName').value = hoVaTen;
     document.getElementById('birthDate').value = ngaySinh;
