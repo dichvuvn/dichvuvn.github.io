@@ -12,7 +12,7 @@
             font-family: Arial, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d0a0a 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -20,26 +20,51 @@
             color: #fff;
         }
         .container {
-            background: rgba(255,255,255,0.15);
+            background: rgba(20, 20, 20, 0.9);
             padding: 40px 50px;
             border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            border: 2px solid #b30000;
+            box-shadow: 0 0 30px rgba(179, 0, 0, 0.35);
             text-align: center;
-            max-width: 500px;
-            width: 90%;
+            max-width: 520px;
+            width: 92%;
         }
         h1 {
             font-size: 28px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            color: #ff3333;
+        }
+        .progress-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #2b2b2b;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid #660000;
+            margin-bottom: 30px;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 3.33%;
+            background: linear-gradient(90deg, #990000, #ff2222);
+            border-radius: 13px;
+            transition: width 0.6s ease;
+            box-shadow: 0 0 12px #ff3333;
         }
         .info-box {
-            background: rgba(0,0,0,0.15);
+            background: rgba(40, 40, 40, 0.8);
             padding: 15px;
             border-radius: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             text-align: left;
             line-height: 1.8;
+            border-left: 4px solid #cc0000;
         }
         .countdown {
             display: flex;
@@ -48,36 +73,50 @@
             flex-wrap: wrap;
         }
         .box {
-            background: rgba(255,255,255,0.2);
+            background: rgba(60, 0, 0, 0.6);
             padding: 20px 10px;
             border-radius: 12px;
             flex: 1;
             min-width: 90px;
+            border: 1px solid #880000;
         }
         .num {
             font-size: 32px;
             font-weight: bold;
             margin-bottom: 8px;
+            color: #ff4d4d;
         }
         .label {
             font-size: 14px;
             opacity: 0.9;
+            color: #ffb3b3;
         }
         .done {
             font-size: 26px;
             font-weight: bold;
-            color: #ffd700;
+            color: #ffcc00;
             margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+            background: rgba(68, 54, 0, 0.6);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📧 Lịch Ngâm Mail 30 Ngày</h1>
+        <h1>📧 NGÂM MAIL 30 NGÀY</h1>
+
+        <div class="progress-text" id="progressText">1 / 30</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
         <div class="info-box">
             <p><strong>Ngày bắt đầu:</strong> 26/08/2026 17:49:19</p>
             <p><strong>Ngày hoàn thành:</strong> 25/09/2026 17:49:19</p>
         </div>
+
         <div class="countdown" id="countdown">
             <div class="box">
                 <div class="num" id="day">00</div>
@@ -96,23 +135,43 @@
                 <div class="label">Giây</div>
             </div>
         </div>
-        <div id="done-msg" class="done" style="display:none;">✅ Đã đủ 30 ngày!</div>
+
+        <div id="done-msg" class="done" style="display:none;">
+            ✅ ĐỦ 30 NGÀY! HOÀN THÀNH!
+        </div>
     </div>
 
     <script>
-        // Thời điểm kết thúc: 25/09/2026 17:49:19
+        // Thời gian
+        const startTime = new Date('2026-08-26T17:49:19');
         const endTime = new Date('2026-09-25T17:49:19');
+        const totalDuration = endTime - startTime;
+        const totalDays = 30;
 
         function update() {
             const now = new Date();
+            const elapsed = now - startTime;
             const diff = endTime - now;
 
+            // Đã đủ 30 ngày
             if (diff <= 0) {
                 document.getElementById('countdown').style.display = 'none';
+                document.getElementById('progressText').textContent = '30 / 30';
+                document.getElementById('progressFill').style.width = '100%';
                 document.getElementById('done-msg').style.display = 'block';
                 return;
             }
 
+            // Tính số ngày đã trôi qua (làm tròn lên)
+            const dayElapsed = elapsed / totalDuration;
+            const currentDay = Math.max(1, Math.ceil(dayElapsed * totalDays));
+            const percent = dayElapsed * 100;
+
+            // Cập nhật thanh tiến độ + số thứ tự ngày
+            document.getElementById('progressText').textContent = `${currentDay} / 30`;
+            document.getElementById('progressFill').style.width = `${percent}%`;
+
+            // Cập nhật đếm ngược
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
             const minutes = Math.floor((diff / (1000 * 60)) % 60);
