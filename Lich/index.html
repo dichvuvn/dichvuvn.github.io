@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đếm Ngâm Mail 30 Ngày</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        .container {
+            background: rgba(255,255,255,0.15);
+            padding: 40px 50px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 25px;
+        }
+        .info-box {
+            background: rgba(0,0,0,0.15);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: left;
+            line-height: 1.8;
+        }
+        .countdown {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .box {
+            background: rgba(255,255,255,0.2);
+            padding: 20px 10px;
+            border-radius: 12px;
+            flex: 1;
+            min-width: 90px;
+        }
+        .num {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .done {
+            font-size: 26px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Lịch Ngâm Mail 30 Ngày</h1>
+        <div class="info-box">
+            <p><strong>Ngày bắt đầu:</strong> 26/08/2026 17:49:19</p>
+            <p><strong>Ngày hoàn thành:</strong> 25/09/2026 17:49:19</p>
+        </div>
+        <div class="countdown" id="countdown">
+            <div class="box">
+                <div class="num" id="day">00</div>
+                <div class="label">Ngày</div>
+            </div>
+            <div class="box">
+                <div class="num" id="hour">00</div>
+                <div class="label">Giờ</div>
+            </div>
+            <div class="box">
+                <div class="num" id="min">00</div>
+                <div class="label">Phút</div>
+            </div>
+            <div class="box">
+                <div class="num" id="sec">00</div>
+                <div class="label">Giây</div>
+            </div>
+        </div>
+        <div id="done-msg" class="done" style="display:none;">✅ Đã đủ 30 ngày!</div>
+    </div>
+
+    <script>
+        // Thời điểm kết thúc: 25/09/2026 17:49:19
+        const endTime = new Date('2026-09-25T17:49:19');
+
+        function update() {
+            const now = new Date();
+            const diff = endTime - now;
+
+            if (diff <= 0) {
+                document.getElementById('countdown').style.display = 'none';
+                document.getElementById('done-msg').style.display = 'block';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('day').textContent = String(days).padStart(2, '0');
+            document.getElementById('hour').textContent = String(hours).padStart(2, '0');
+            document.getElementById('min').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('sec').textContent = String(seconds).padStart(2, '0');
+        }
+
+        update();
+        setInterval(update, 1000);
+    </script>
+</body>
+</html>
